@@ -1,0 +1,14 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This is INSTALL file for 'Command line parameters parser (CLPP)' library.
+
+Last update: March 15, 2010
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+COMMAND LINE PARAMETERS PARSER
+version 0.9.3
+
+Installing not required. Just copy 'clpp' folder in some place where your compiler searches header files and add:
+ 
+#include <clpp/parser.hpp> 
+
+in your program.
