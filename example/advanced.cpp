@@ -43,10 +43,24 @@ namespace {
 			// some action...
 		}
 	};
+	
+	// Supports since 0.9.4 version.
+	/*
+	class Optimizer {
+		// Some_storage m_storage;
+	public:
+		void level( const int& lev ) {
+			std::cout << "level: " << lev << std::endl;
+			// No need boost::lexical_cast< int >( lev ) anymore!
+			// m_storage.store_level( lev );
+		}
+	};
+	*/
 }
 
 int main( int argc, char* argv[] ) {
 	Log log;
+	Optimizer optimizer;
 	{
 	clp_parser::command_line_parameter_parser parser;
 	
@@ -65,7 +79,11 @@ int main( int argc, char* argv[] ) {
 		  .check_type( clp_parser::unsigned_integer )  
 		  ;
 	parser.add_parameter( "-ls", "--log-some", &log, &Log::log_some );
-	parser.add_parameter( "-li", "--log-init", &Log::log_init ); // static member-function using as global function.
+	// static member-function using as global function.
+	parser.add_parameter( "-li", "--log-init", &Log::log_init ); 
+	
+	// parser.add_parameter( "-o", "--optimize", &optimizer, &Optimizer::level );
+	
 	try {
 		parser.parse( argc, argv );
 	} catch ( const std::exception& exc ) {
