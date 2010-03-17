@@ -1,4 +1,7 @@
-// Example of CLPP 0.9.3 using. 
+// Example of advanced usage of CLPP 0.9.3.
+//
+// Copyright (C) Denis Shevchenko, 2010.
+// shev.denis @ gmail.com
 
 #include <clpp/parser.hpp>
 
