@@ -487,7 +487,9 @@ class command_line_parameter_parser : private boost::noncopyable {
 private:
     typedef boost::ptr_vector< cl_param >
             params_storage;
-    
+    // typedef boost::ptr_vector< abstract_parameter >
+    //      params_storage;
+
     typedef boost::signals2::signal< void ( const std::string& /* value */ ) >
             sig_checker;
     typedef boost::shared_ptr< sig_checker > 
@@ -718,6 +720,115 @@ public:
         m_params.push_back( new cl_param( std::make_pair( single_name, "" ), obj, callable ) );
         return m_params.back();
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    // 1.0rc
+    /*
+    /// \brief Add new command line parameter.
+	/// \param short_name Short name of parameter.
+	/// \param full_name Full name of parameter.
+	/// \param obj Pointer to object.
+	/// \param callable Pointer on object's function (without value).
+	/// \return reference on this parameter;
+    template< typename Object > 
+	cl_param< Object >& add_parameter( const std::string&   short_name, 
+                        	           const std::string&   full_name, 
+                        	           Object* 			    obj,
+                        	           void (Object::*callable)() ) {  
+        if ( 0 == obj ) {
+        	throw std::invalid_argument( "Zero pointer on object with callable function!" );
+        } else {}
+        if ( 0 == callable ) {
+        	throw std::invalid_argument( "Zero pointer on callable function!" );
+        } else {}
+        if ( short_name == full_name ) {
+            std::string error = "Duplicate names of parameter: '"
+                                + short_name + "', '"
+                                + full_name + "'! Check your code.";
+            throw std::invalid_argument( error );
+        } else {}
+        check_uniq_names( short_name, full_name ); // Is new names?
+        m_params.push_back( new cl_param< Object >( std::make_pair( short_name, full_name ), 
+                                                    obj, 
+                                                    callable ) );
+        return m_params.back();
+    }
+    
+    /// \brief Add new command line parameter.
+	/// \param short_name Short name of parameter.
+	/// \param full_name Full name of parameter.
+	/// \param obj Pointer to object.
+	/// \param callable Pointer on object's function (with value).
+	/// \return reference on this parameter;
+    template< typename Object, typename Argument >
+	cl_param< Object, Argument >& add_parameter( const std::string& short_name, 
+                        	                     const std::string& full_name, 
+                        	                     Object* 			obj,
+                        	                     void (Object::*callable)( const Argument& ) ) {  
+        if ( 0 == obj ) {
+        	throw std::invalid_argument( "Zero pointer on object with callable function!" );
+        } else {}
+        if ( 0 == callable ) {
+        	throw std::invalid_argument( "Zero pointer on callable function!" );
+        } else {}
+        if ( short_name == full_name ) {
+            std::string error = "Duplicate names of parameter: '"
+                                + short_name + "', '"
+                                + full_name + "'! Check your code.";
+            throw std::invalid_argument( error );
+        } else {}
+        check_uniq_names( short_name, full_name ); // Is new names?
+        m_params.push_back( new cl_param< Object, Argument >( std::make_pair( short_name, full_name ), 
+                                                              obj, 
+                                                              callable ) );
+        return m_params.back();
+    }
+    
+    /// \brief Add new command line parameter.
+	/// \param single_name Single name of parameter.
+	/// \param obj Pointer to object.
+	/// \param callable Pointer on object's function (without value).
+	/// \return reference on this parameter;
+    template< typename Object > 
+	cl_param< Object >& add_parameter( const std::string&   single_name,
+                        	           Object* 			    obj,
+                        	           void (Object::*callable)() ) {  
+        if ( 0 == obj ) {
+        	throw std::invalid_argument( "Zero pointer on object with callable function!" );
+        } else {}
+        if ( 0 == callable ) {
+        	throw std::invalid_argument( "Zero pointer on callable function!" );
+        } else {}
+        check_uniq_names( single_name ); // Is new name?
+        m_params.push_back( new cl_param< Object >( std::make_pair( single_name, "" ), 
+                                                    obj, 
+                                                    callable ) );
+        return m_params.back();
+    }
+    
+    /// \brief Add new command line parameter.
+	/// \param single_name Single name of parameter.
+	/// \param obj Pointer to object.
+	/// \param callable Pointer on object's function (with value).
+	/// \return reference on this parameter;
+    template< typename Object, typename Argument >
+	cl_param< Object, Argument >& add_parameter( const std::string& single_name,
+                        	                     Object* 			obj,
+                        	                     void (Object::*callable)( const Argument& ) ) {  
+        if ( 0 == obj ) {
+        	throw std::invalid_argument( "Zero pointer on object with callable function!" );
+        } else {}
+        if ( 0 == callable ) {
+        	throw std::invalid_argument( "Zero pointer on callable function!" );
+        } else {}
+        check_uniq_names( single_name ); // Is new name?
+        m_params.push_back( new cl_param< Object, Argument >( std::make_pair( single_name, "" ), 
+                                                              obj, 
+                                                              callable ) );
+        return m_params.back();
+    }
+    */
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
 public:
  	/// \brief Set another value separator, instead default '='.
  	/// \param sep Separator.
