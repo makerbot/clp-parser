@@ -422,14 +422,18 @@ public:
 	/// \brief Define parameter's default value.
 	/// \param value Default value.
 	/// \return *this
-	own_type& default_value( const Argument& value ) {
+	template< typename Some_argument >
+	own_type& default_value( const Some_argument& value ) {
 		if ( is_necessary ) {
 			std::string error = "Option '" 
 			                    + name.first 
 			                    + "' already define in necessary mode, so it cannot have default value!"; 
 			throw std::invalid_argument( error );
 		} else {}
-        // checking?
+        if ( typeid( Some_argument ) != typeid( Argument ) ) {
+        	std::string error = "Default value's type differ from value's type defined by callable function!";
+        	throw std::invalid_argument( error );
+        } else {}
 		def_value = value;
 		if ( typeid( def_value ) == typeid( std::string )
              && 
