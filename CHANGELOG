@@ -1,8 +1,14 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This is CHANGELOG file for 'Command line parameters parser (CLPP)' library.
 
-Last update: March 15, 2010
+Last update: March 20, 2010
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+0.9.3 --> 1.0rc
+
+- add support of calling functions/functions-members with "non-string" type of argument.
+- documentation correction.
+
 
 0.9.2 --> 0.9.3
 

@@ -1,4 +1,4 @@
-// Example of advanced usage of CLPP 0.9.3.
+// Example of advanced usage of CLPP 1.0rc.
 //
 // Copyright (C) Denis Shevchenko, 2010.
 // shev.denis @ gmail.com
@@ -44,7 +44,7 @@ namespace {
 		}
 	};
 	
-	// Supports since 0.9.4 version.
+	// Supports since 1.0rc version.
 	/*
 	class Optimizer {
 		// Some_storage m_storage;
@@ -82,6 +82,7 @@ int main( int argc, char* argv[] ) {
 	// static member-function using as global function.
 	parser.add_parameter( "-li", "--log-init", &Log::log_init ); 
 	
+	// 1.0rc version.
 	// parser.add_parameter( "-o", "--optimize", &optimizer, &Optimizer::level );
 	
 	try {

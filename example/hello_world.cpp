@@ -1,4 +1,4 @@
-// Example of simplest usage of CLPP 0.9.3. 
+// Example of simplest usage of CLPP 1.0rc.
 //
 // Copyright (C) Denis Shevchenko, 2010.
 // shev.denis @ gmail.com
