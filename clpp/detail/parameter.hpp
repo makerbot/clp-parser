@@ -264,8 +264,8 @@ struct abstract_parameter {};
 ///
 struct empty_type {};
 
-///
-///
+/// \struct parameter
+/// \brief Command line parameter.
 ///
 ///
 template< typename Object, template Argument = empty_type >

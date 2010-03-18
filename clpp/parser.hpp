@@ -731,10 +731,10 @@ public:
 	/// \param callable Pointer on object's function (without value).
 	/// \return reference on this parameter;
     template< typename Object > 
-	cl_param< Object >& add_parameter( const std::string&   short_name, 
-                        	           const std::string&   full_name, 
-                        	           Object* 			    obj,
-                        	           void (Object::*callable)() ) {  
+	detail::abstract_parameter& add_parameter( const std::string&   short_name, 
+                        	           		   const std::string&   full_name, 
+                        	           		   Object* 			    obj,
+                        	           		   void (Object::*callable)() ) {  
         if ( 0 == obj ) {
         	throw std::invalid_argument( "Zero pointer on object with callable function!" );
         } else {}
@@ -748,9 +748,9 @@ public:
             throw std::invalid_argument( error );
         } else {}
         check_uniq_names( short_name, full_name ); // Is new names?
-        m_params.push_back( new cl_param< Object >( std::make_pair( short_name, full_name ), 
-                                                    obj, 
-                                                    callable ) );
+        m_params.push_back( new detail::parameter< Object >( std::make_pair( short_name, full_name ), 
+                                                    		 obj, 
+                                                    		 callable ) );
         return m_params.back();
     }
     
@@ -761,10 +761,10 @@ public:
 	/// \param callable Pointer on object's function (with value).
 	/// \return reference on this parameter;
     template< typename Object, typename Argument >
-	cl_param< Object, Argument >& add_parameter( const std::string& short_name, 
-                        	                     const std::string& full_name, 
-                        	                     Object* 			obj,
-                        	                     void (Object::*callable)( const Argument& ) ) {  
+	detail::abstract_parameter& add_parameter( const std::string& 	short_name, 
+                        	                   const std::string& 	full_name, 
+                        	                   Object* 				obj,
+                        	                   void (Object::*callable)( const Argument& ) ) {  
         if ( 0 == obj ) {
         	throw std::invalid_argument( "Zero pointer on object with callable function!" );
         } else {}
@@ -778,9 +778,9 @@ public:
             throw std::invalid_argument( error );
         } else {}
         check_uniq_names( short_name, full_name ); // Is new names?
-        m_params.push_back( new cl_param< Object, Argument >( std::make_pair( short_name, full_name ), 
-                                                              obj, 
-                                                              callable ) );
+        m_params.push_back( new detail::parameter< Object, Argument >( std::make_pair( short_name, full_name ), 
+                                                              		   obj, 
+                                                              		   callable ) );
         return m_params.back();
     }
     
@@ -790,9 +790,9 @@ public:
 	/// \param callable Pointer on object's function (without value).
 	/// \return reference on this parameter;
     template< typename Object > 
-	cl_param< Object >& add_parameter( const std::string&   single_name,
-                        	           Object* 			    obj,
-                        	           void (Object::*callable)() ) {  
+	detail::abstract_parameter& add_parameter( const std::string&   single_name,
+                        	           		   Object* 			    obj,
+                        	           		   void (Object::*callable)() ) {  
         if ( 0 == obj ) {
         	throw std::invalid_argument( "Zero pointer on object with callable function!" );
         } else {}
@@ -800,9 +800,9 @@ public:
         	throw std::invalid_argument( "Zero pointer on callable function!" );
         } else {}
         check_uniq_names( single_name ); // Is new name?
-        m_params.push_back( new cl_param< Object >( std::make_pair( single_name, "" ), 
-                                                    obj, 
-                                                    callable ) );
+        m_params.push_back( new detail::parameter< Object >( std::make_pair( single_name, "" ), 
+                                                    		 obj, 
+                                                    		 callable ) );
         return m_params.back();
     }
     
@@ -812,9 +812,9 @@ public:
 	/// \param callable Pointer on object's function (with value).
 	/// \return reference on this parameter;
     template< typename Object, typename Argument >
-	cl_param< Object, Argument >& add_parameter( const std::string& single_name,
-                        	                     Object* 			obj,
-                        	                     void (Object::*callable)( const Argument& ) ) {  
+	detail::abstract_parameter& add_parameter( const std::string& 	single_name,
+                        	                   Object* 				obj,
+                        	                   void (Object::*callable)( const Argument& ) ) {  
         if ( 0 == obj ) {
         	throw std::invalid_argument( "Zero pointer on object with callable function!" );
         } else {}
@@ -822,9 +822,9 @@ public:
         	throw std::invalid_argument( "Zero pointer on callable function!" );
         } else {}
         check_uniq_names( single_name ); // Is new name?
-        m_params.push_back( new cl_param< Object, Argument >( std::make_pair( single_name, "" ), 
-                                                              obj, 
-                                                              callable ) );
+        m_params.push_back( new detail::parameter< Object, Argument >( std::make_pair( single_name, "" ), 
+                                                              		   obj, 
+                                                              		   callable ) );
         return m_params.back();
     }
     */
