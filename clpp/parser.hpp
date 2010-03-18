@@ -1036,6 +1036,16 @@ private:
     		    	(*m_vs_checker.at( param.value_s ))( param.def_value );
     		    }
     		} else {}
+    		
+    		/*
+    		if ( names.end() != it && param.has_def_value ) {
+    		    if        ( v_chk == type && no_type != param.value_t ) {
+    		    	(*m_vt_checker.at( param.value_t ))( param.def_value );
+    		    } else if ( v_chk == semantic && no_semantic != param.value_s ) {
+    		    	(*m_vs_checker.at( param.value_s ))( param.def_value );
+    		    }
+    		} else {}
+    		*/
     	}
     }
     
@@ -1140,6 +1150,16 @@ public:
     		     !param.sig_with_value.empty() ) {
     			param.sig_with_value( param.def_value );
     		} else {}
+    		
+    		/*
+    		if ( names.end() != it 
+    		     && 
+    		     param.has_def_value
+    		     && 
+    		     !param.sig_with_value.empty() ) {
+    			param.sig_with_value( param.def_value );
+    		} else {}
+    		*/
     	}
     }
 };

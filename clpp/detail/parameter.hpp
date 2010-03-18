@@ -288,6 +288,8 @@ public:
     explicit parameter( const parameter_name& nm, void (*callable)() ) :
             name( nm )
             , is_necessary( false )
+            , def_value()
+            , has_def_value( false )
             , value_t( no_type )
             , value_s( no_semantic ) {
         if ( boost::contains( name.first, " " ) 
@@ -308,6 +310,8 @@ public:
       					void (*callable)( const Argument& ) :
             name( nm )
             , is_necessary( false )
+            , def_value()
+            , has_def_value( false )
             , value_t( no_type )
             , value_s( no_semantic ) {
         if ( boost::contains( name.first, " " ) 
@@ -330,6 +334,8 @@ public:
       					void (Object::*callable)() ) :
             name( nm )
             , is_necessary( false )
+            , def_value()
+            , has_def_value( false )
             , value_t( no_type )
             , value_s( no_semantic ) {
         if ( boost::contains( name.first, " " ) 
@@ -352,6 +358,8 @@ public:
       					void (Object::*callable)( const Argument& ) ) :
             name( nm )
             , is_necessary( false )
+            , def_value()
+            , has_def_value( false )
             , value_t( no_type )
             , value_s( no_semantic ) {
         if ( boost::contains( name.first, " " ) 
@@ -375,6 +383,8 @@ public:
 	
 	/// \brief Parameter's default value.
 	Argument			def_value;
+	
+	bool 				has_def_value;
 
 	/// \brief Signal for callback correspond function.
 	/// Must be used for parameters without value.
@@ -409,7 +419,7 @@ public:
 	/// \brief Define parameter as necessary.
 	/// \return *this
 	own_type& necessary() {
-		if ( !def_value.empty() ) {
+		if ( has_def_value ) {
 			std::string error = "Option '" 
 			                    + name.first 
 			                    + "' already have default value, so it cannot define in necessary mode!"; 
@@ -435,6 +445,7 @@ public:
         	throw std::invalid_argument( error );
         } else {}
 		def_value = value;
+		has_def_value = true;
 		if ( typeid( def_value ) == typeid( std::string )
              && 
              boost::contains( def_value, " " ) ) {
