@@ -23,15 +23,11 @@
 #define DETAIL__CHECKERS_HPP
 
 #include <boost/filesystem/operations.hpp>
-#include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/address_v4.hpp>
 #include <boost/asio/ip/address_v6.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/foreach.hpp>
-
+ 
 #include <string>
-#include <vector>
-
+ 
 /// \namespace clp_parser
 /// \brief Main namespace of library.
 namespace clp_parser {
@@ -40,8 +36,49 @@ namespace clp_parser {
 /// \brief Details of realisation.
 namespace detail {
 
-typedef std::vector< std::string > 
-		str_storage;
+/// \brief Check non-zero pointer on function.
+/// \param ptr Pointer on function.
+/// \throw std::invalid_argument If pointer is null.
+template< typename T >
+void check_ptr( T* ptr ) {
+	if ( 0 == ptr ) {
+        throw std::invalid_argument( "Zero pointer on callable function!" );
+    } else {}
+}
+
+/// \brief Check non-zero pointer on function.
+/// \param obj Pointer on object.
+/// \param fn Pointer on member-function (without value).
+/// \throw std::invalid_argument If pointer(s) is null.
+template< typename Object > 
+void check_ptr( Object* obj,
+                void (Object::*fn)() ) {
+	if ( 0 == obj ) {
+        throw std::invalid_argument( "Zero pointer on object!" );
+    } else {}
+    if ( 0 == fn ) {
+        throw std::invalid_argument( "Zero pointer on object's function!" );
+    } else {}
+}
+
+/// \brief Check non-zero pointer on function.
+/// \param obj Pointer on object.
+/// \param fn Pointer on member-function (with value).
+/// \throw std::invalid_argument If pointer(s) is null. 
+template
+    < 
+    	typename Object
+    	, typename Arg
+    > 
+void check_ptr( Object* obj,
+                void (Object::*fn)( const Arg& ) ) {
+	if ( 0 == obj ) {
+        throw std::invalid_argument( "Zero pointer on object!" );
+    } else {}
+    if ( 0 == fn ) {
+        throw std::invalid_argument( "Zero pointer on object's function!" );
+    } else {}
+}
 
 /// \brief Check IPv4-address validity.
 /// \param address IP-address.
@@ -88,39 +125,6 @@ void check_path_validity( const std::string& path ) {
 	if ( !boost::filesystem::exists( path ) ) {
         throw std::invalid_argument( "Path '" + path + "' not exist!" );
     } else {}
-}
-
-/// \brief Check integer type of value.
-/// \param value Value.
-/// \throw std::invalid_argument If value' type is not integer.
-void check_integer( const std::string& value ) {
-    try { 
-		boost::lexical_cast< int >( value );
-    } catch ( const std::exception& /* exc */ ) {
-        throw std::invalid_argument( "Value '" + value + "' is not <integer> type!" );
-    }
-}
-
-/// \brief Check unsigned integer type of value.
-/// \param value Value.
-/// \throw std::invalid_argument If value' type is not unsigned integer.
-void check_unsigned_integer( const std::string& value ) {
-    try { 
-		boost::lexical_cast< unsigned int >( value );
-    } catch ( const std::exception& /* exc */ ) {
-        throw std::invalid_argument( "Value '" + value + "' is not <unsigned integer> type!" );
-    }
-}
-
-/// \brief Check real type of value.
-/// \param value Value.
-/// \throw std::invalid_argument If value' type is not real.
-void check_real( const std::string& value ) {
-    try { 
-		boost::lexical_cast< double >( value );
-    } catch ( const std::exception& /* exc */ ) {
-        throw std::invalid_argument( "Value '" + value + "' is not <real> type!" );
-    }
 }
 
 } // namespace detail

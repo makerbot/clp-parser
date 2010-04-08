@@ -22,23 +22,20 @@
 #ifndef DETAIL__PARAMETER_HPP
 #define DETAIL__PARAMETER_HPP
 
+#include <boost/algorithm/string.hpp>
 #include <boost/signals2/signal.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/foreach.hpp>
+#include <boost/any.hpp>
 
 #include <string>
+#include <vector>
 
 /// \namespace clp_parser
 /// \brief Main namespace of library.
 namespace clp_parser {
-
-/// \enum value_type 
-/// \brief Value types (for checking).
-enum value_type {
-	no_type				/*!< Default value. */
-	, integer			/*!< Integer type checking. */
-	, unsigned_integer	/*!< Unsigned integer type checking. */
-	, real				/*!< Real type checking. */
-};
 
 /// \enum value_semantic 
 /// \brief Value semantic types (for checking).
@@ -51,153 +48,171 @@ enum value_semantic {
 };
 
 /// \namespace clp_parser::detail
-/// \brief Details of realisation.
+/// \brief Details of realization.
 namespace detail {
 
 typedef std::vector< std::string > 
 		str_storage;
 
-/// \brief Pointer on function without value.
-/// Call for simple parameters.
-typedef void (*f_no_value)();
+/// \struct arg_holder
+/// \brief Hold objects needed for parameters with value.
+template< typename Arg >
+struct arg_holder {
+	typedef boost::signals2::signal< void ( const Arg& /* value */ ) >
+            sig_with_value_type;
+public:
+	/// \brief Overloaded ctor for register global function with argument.
+	/// \param fn Pointer on function.
+	explicit arg_holder( void (*fn)( const Arg& ) ) {
+		sig_with_value.connect( fn );
+	}
+	
+	/// \brief Overloaded ctor for register member-function with argument.
+	/// \param obj Pointer on object.
+	/// \param fn Pointer on member-function.
+	template< typename Object >
+	explicit arg_holder( Object* obj
+						 , void (Object::*fn)( const Arg& ) ) {
+		sig_with_value.connect( boost::bind( fn, obj, _1 ) );
+	}
+	
+	/// \brief Signal for callback correspond function.
+	/// Must be used for parameters with value.
+    sig_with_value_type sig_with_value;
+    
+    /// \brief Default parameter's value.
+    Arg 				def_value;
+};
 
-/// \brief Pointer on function with string-value.
-/// Call for parameters with values.
-typedef void (*f_with_value)(const std::string&);
+typedef boost::shared_ptr< arg_holder< int > > 				i_arg_holder_p;
+typedef boost::shared_ptr< arg_holder< unsigned int > > 	ui_arg_holder_p;
+typedef boost::shared_ptr< arg_holder< double > > 			d_arg_holder_p;
+typedef boost::shared_ptr< arg_holder< std::string > > 		s_arg_holder_p;
 
 /// \struct parameter
 /// \brief Command line parameter.
 ///
 /// Presents one command line parameter
 /// with necessary options.
-struct parameter : private boost::noncopyable {
-public:
+struct parameter : boost::noncopyable {
     typedef boost::signals2::signal< void () >
     		sig_type;
-    typedef boost::signals2::signal< void ( const std::string& /* value */ ) >
-            sig_with_value_type;
-    typedef std::pair< std::string /* short_name */, std::string /* full_name */ >
+    typedef std::pair
+    			< 
+    				std::string /* short_name */
+    				, std::string /* full_name */ 
+    			>
             parameter_name;
 public:
 	/// \brief Overloaded ctor, for callable functions without values.
 	/// \param nm Parameter's name.
-	/// \param callable Pointer on function.
-    explicit parameter( const parameter_name& 	nm, 
-      					detail::f_no_value 		callable ) :
+	/// \param fn Pointer on function.
+    explicit parameter( const parameter_name& nm 
+      					, void (*fn)() ) :
             name( nm )
             , is_necessary( false )
-            , value_t( no_type )
+            , has_def_value( false )
             , value_s( no_semantic ) {
         if ( boost::contains( name.first, " " ) 
-             || 
-             boost::contains( name.second, " " ) ) {
+             || boost::contains( name.second, " " ) ) {
         	std::string error = "Invalid parameter's name '" 
         						+ name.first 
         						+ "', it shouldn't contains space(s)!";
         	throw std::runtime_error( error );
         } else {}
-        sig.connect( callable );
+        sig.connect( fn );
     }
     
    	/// \brief Overloaded ctor, for callable functions with values.
    	/// \param nm Parameter's name.
-   	/// \param callable Pointer on function.
-    explicit parameter( const parameter_name& 	nm, 
-      					detail::f_with_value 	callable ) :
+   	/// \param fn Pointer on function.
+    template< typename Arg >
+    explicit parameter( const parameter_name& nm
+      					, void (*fn)( const Arg& ) ) :
             name( nm )
+            , for_arg( boost::make_shared< arg_holder<Arg> >( fn ) )
             , is_necessary( false )
-            , value_t( no_type )
+            , has_def_value( false )
             , value_s( no_semantic ) {
         if ( boost::contains( name.first, " " ) 
-             || 
-             boost::contains( name.second, " " ) ) {
+             || boost::contains( name.second, " " ) ) {
         	std::string error = "Invalid parameter's name '" 
         						+ name.first 
         						+ "', it shouldn't contains space(s)!";
         	throw std::runtime_error( error );
         } else {}
-        sig_with_value.connect( callable );
     }
     
     /// \brief Overloaded ctor, for callable object's function without values.
    	/// \param nm Parameter's name.
    	/// \param obj Pointer on object.
-   	/// \param callable Pointer on object's function.
+   	/// \param fn Pointer on object's function.
     template< typename T >
-    explicit parameter( const parameter_name& 	nm, 
-      					T* 						obj,
-      					void (T::*callable)() ) :
+    explicit parameter( const parameter_name& nm 
+      					, T* 				  obj
+      					, void (T::*fn)() ) :
             name( nm )
             , is_necessary( false )
-            , value_t( no_type )
+            , has_def_value( false )
             , value_s( no_semantic ) {
         if ( boost::contains( name.first, " " ) 
-             || 
-             boost::contains( name.second, " " ) ) {
+             || boost::contains( name.second, " " ) ) {
         	std::string error = "Invalid parameter's name '" 
         						+ name.first 
         						+ "', it shouldn't contains space(s)!";
         	throw std::runtime_error( error );
         } else {}
-        sig.connect( boost::bind( callable, obj ) );
+        sig.connect( boost::bind( fn, obj ) );
     }
     
     /// \brief Overloaded ctor, for callable object's function with values.
    	/// \param nm Parameter's name.
    	/// \param obj Pointer on object.
-   	/// \param callable Pointer on object's function.
-    template< typename T >
-    explicit parameter( const parameter_name& 	nm, 
-      					T* 						obj,
-      					void (T::*callable)( const std::string& /* value */ ) ) :
+   	/// \param fn Pointer on object's function.
+    template
+    	< 
+    		typename T
+    		, typename Arg 
+    	>
+    explicit parameter( const parameter_name& nm 
+      					, T* 				  obj
+      					, void (T::*fn)( const Arg& ) ) :
             name( nm )
+            , for_arg( boost::make_shared< arg_holder<Arg> >( obj, fn ) )
             , is_necessary( false )
-            , value_t( no_type )
+            , has_def_value( false )
             , value_s( no_semantic ) {
         if ( boost::contains( name.first, " " ) 
-             || 
-             boost::contains( name.second, " " ) ) {
+             || boost::contains( name.second, " " ) ) {
         	std::string error = "Invalid parameter's name '" 
         						+ name.first 
         						+ "', it shouldn't contains space(s)!";
         	throw std::runtime_error( error );
         } else {}
-        sig_with_value.connect( boost::bind( callable, obj, _1 ) );
     }
 public:
 	/// \brief Parameter's name.
-	parameter_name  	name;
+	parameter_name  name;
 	
 	/// \brief Necessity flag.
 	/// If it true, this parameter _must_
 	/// be in command line.
-	bool 				is_necessary;
+	bool 			is_necessary;
 	
-	/// \brief Parameter's default value.
-	std::string			def_value;
+	/// \brief Default value flag.
+	/// If it true, this parameter can be missing.
+	bool 			has_def_value;
+	
+	/// \brief arg_holder for parameters with value;
+	boost::any		for_arg;
 
 	/// \brief Signal for callback correspond function.
 	/// Must be used for parameters without value.
-    sig_type          	sig;
+    sig_type		sig;
     
-    /// \brief Signal for callback correspond function.
-	/// Must be used for parameters with value.
-    sig_with_value_type sig_with_value;
-    
-    /// \brief Value's type label.
-	value_type 			value_t;
-	
 	/// \brief Value's semantis label.
-	value_semantic 		value_s;
+	value_semantic 	value_s;
 public:
-	/// \brief Define parameter with type's checked value.
-	/// \param vt Value's type field.
-	/// \return *this
-	parameter& check_type( const value_type& vt ) {
-		value_t = vt;
-		return *this;
-	}
-	
 	/// \brief Define parameter with semantic's checked value.
 	/// \param vs Value's semantic field.
 	/// \return *this
@@ -209,221 +224,10 @@ public:
 	/// \brief Define parameter as necessary.
 	/// \return *this
 	parameter& necessary() {
-		if ( !def_value.empty() ) {
-			std::string error = "Option '" 
-			                    + name.first 
-			                    + "' already have default value, so it cannot define in necessary mode!"; 
-			throw std::runtime_error( error );
-		} else {}
-		is_necessary = true;
-		return *this;
-	}
-	
-	/// \brief Define parameter's default value.
-	/// \param value Default value.
-	/// \return *this
-	template< typename T >
-	parameter& default_value( const T& value ) {
-		if ( is_necessary ) {
-			std::string error = "Option '" 
-			                    + name.first 
-			                    + "' already define in necessary mode, so it cannot have default value!"; 
-			throw std::invalid_argument( error );
-		} else {}
-		def_value = boost::lexical_cast< std::string >( value );
-		if ( boost::contains( def_value, " " ) ) {
-        	std::string error = "Invalid default parameter's value '" 
-        						+ name.first 
-        						+ "': it shouldn't contains space(s)!";
-        	throw std::invalid_argument( error );
-        } else {}
-		return *this;
-	}
-};
-
-
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// 1.0rc
-/*
-
-/// \struct abstract_parameter
-/// \brief Abstract parameter.
-///
-/// Presents abstract parent for 
-/// all parameters (polimorphism).
-struct abstract_parameter {};
-
-/// \struct
-/// \brief 
-///
-///
-struct empty_type {};
-
-/// \struct parameter
-/// \brief Command line parameter.
-///
-///
-template< typename Object, template Argument = empty_type >
-struct parameter : private boost::noncopyable, 
-                   public abstract_parameter {
-public:
-    typedef parameter< Object, Argument >
-            own_type;
-
-    typedef boost::signals2::signal< void () >
-    		sig_type;
-    typedef boost::signals2::signal< void ( const Argument& ) >
-            sig_with_value_type;
-    typedef std::pair< std::string, std::string >
-            parameter_name;
-public:
-	/// \brief Overloaded ctor, for callable functions without values.
-	/// \param nm Parameter's name.
-	/// \param callable Pointer on function.
-    explicit parameter( const parameter_name& nm, void (*callable)() ) :
-            name( nm )
-            , is_necessary( false )
-            , def_value()
-            , has_def_value( false )
-            , value_t( no_type )
-            , value_s( no_semantic ) {
-        if ( boost::contains( name.first, " " ) 
-             || 
-             boost::contains( name.second, " " ) ) {
-        	std::string error = "Invalid parameter's name '" 
-        						+ name.first 
-        						+ "', it shouldn't contains space(s)!";
-        	throw std::runtime_error( error );
-        } else {}
-        sig.connect( callable );
-    }
-    
-   	/// \brief Overloaded ctor, for callable functions with values.
-   	/// \param nm Parameter's name.
-   	/// \param callable Pointer on function.
-    explicit parameter( const parameter_name& nm, 
-      					void (*callable)( const Argument& ) :
-            name( nm )
-            , is_necessary( false )
-            , def_value()
-            , has_def_value( false )
-            , value_t( no_type )
-            , value_s( no_semantic ) {
-        if ( boost::contains( name.first, " " ) 
-             || 
-             boost::contains( name.second, " " ) ) {
-        	std::string error = "Invalid parameter's name '" 
-        						+ name.first 
-        						+ "', it shouldn't contains space(s)!";
-        	throw std::runtime_error( error );
-        } else {}
-        sig_with_value.connect( callable );
-    }
-    
-    /// \brief Overloaded ctor, for callable object's function without values.
-   	/// \param nm Parameter's name.
-   	/// \param obj Pointer on object.
-   	/// \param callable Pointer on object's function.
-    explicit parameter( const parameter_name& 	nm, 
-      					Object* 				obj,
-      					void (Object::*callable)() ) :
-            name( nm )
-            , is_necessary( false )
-            , def_value()
-            , has_def_value( false )
-            , value_t( no_type )
-            , value_s( no_semantic ) {
-        if ( boost::contains( name.first, " " ) 
-             || 
-             boost::contains( name.second, " " ) ) {
-        	std::string error = "Invalid parameter's name '" 
-        						+ name.first 
-        						+ "', it shouldn't contains space(s)!";
-        	throw std::runtime_error( error );
-        } else {}
-        sig.connect( boost::bind( callable, obj ) );
-    }
-    
-    /// \brief Overloaded ctor, for callable object's function with values.
-   	/// \param nm Parameter's name.
-   	/// \param obj Pointer on object.
-   	/// \param callable Pointer on object's function.
-    explicit parameter( const parameter_name& 	nm, 
-      					Object*					obj,
-      					void (Object::*callable)( const Argument& ) ) :
-            name( nm )
-            , is_necessary( false )
-            , def_value()
-            , has_def_value( false )
-            , value_t( no_type )
-            , value_s( no_semantic ) {
-        if ( boost::contains( name.first, " " ) 
-             || 
-             boost::contains( name.second, " " ) ) {
-        	std::string error = "Invalid parameter's name '" 
-        						+ name.first 
-        						+ "', it shouldn't contains space(s)!";
-        	throw std::runtime_error( error );
-        } else {}
-        sig_with_value.connect( boost::bind( callable, obj, _1 ) );
-    }
-public:
-	/// \brief Parameter's name.
-	parameter_name  	name;
-	
-	/// \brief Necessity flag.
-	/// If it true, this parameter _must_
-	/// be in command line.
-	bool 				is_necessary;
-	
-	/// \brief Parameter's default value.
-	Argument			def_value;
-	
-	bool 				has_def_value;
-
-	/// \brief Signal for callback correspond function.
-	/// Must be used for parameters without value.
-    sig_type          	sig;
-    
-    /// \brief Signal for callback correspond function.
-	/// Must be used for parameters with value.
-    sig_with_value_type sig_with_value;
-    
-    /// \brief Value's type label.
-	value_type 			value_t;
-	
-	/// \brief Value's semantis label.
-	value_semantic 		value_s;
-public:
-	/// \brief Define parameter with type's checked value.
-	/// \param vt Value's type field.
-	/// \return *this
-	parameter& check_type( const value_type& vt ) {
-		value_t = vt;
-		return *this;
-	}
-	
-	/// \brief Define parameter with semantic's checked value.
-	/// \param vs Value's semantic field.
-	/// \return *this
-	own_type& check_semantic( const value_semantic& vs ) {
-		value_s = vs;
-		return *this;
-	}
-	
-	/// \brief Define parameter as necessary.
-	/// \return *this
-	own_type& necessary() {
 		if ( has_def_value ) {
-			std::string error = "Option '" 
-			                    + name.first 
-			                    + "' already have default value, so it cannot define in necessary mode!"; 
-			throw std::runtime_error( error );
+			std::string error = "Option '" + name.first 
+			                    + "' already have default value, it cannot be necessary!"; 
+			throw std::logic_error( error );
 		} else {}
 		is_necessary = true;
 		return *this;
@@ -432,40 +236,84 @@ public:
 	/// \brief Define parameter's default value.
 	/// \param value Default value.
 	/// \return *this
-	template< typename Some_argument >
-	own_type& default_value( const Some_argument& value ) {
+	parameter& default_value( const boost::any& value ) {
 		if ( is_necessary ) {
-			std::string error = "Option '" 
-			                    + name.first 
-			                    + "' already define in necessary mode, so it cannot have default value!"; 
-			throw std::invalid_argument( error );
+			std::string error = "Option '" + name.first 
+			                    + "' already define in necessary mode, it cannot have default value!"; 
+			throw std::logic_error( error );
 		} else {}
-        if ( typeid( Some_argument ) != typeid( Argument ) ) {
-        	std::string error = "Default value's type differ from value's type defined by callable function!";
-        	throw std::invalid_argument( error );
-        } else {}
-		def_value = value;
+		
 		has_def_value = true;
-		if ( typeid( def_value ) == typeid( std::string )
-             && 
-             boost::contains( def_value, " " ) ) {
-        	std::string error = "Invalid default parameter's (string) value '" 
-        						+ name.first 
-        						+ "': it shouldn't contains space(s)!";
-        	throw std::invalid_argument( error );
+		
+		if ( value.type() == typeid( std::string ) ) {
+			if ( boost::contains( boost::any_cast< std::string >( value ), " " ) ) {
+        		std::string error = "Invalid default parameter's value '" 
+        							+ name.first 
+        							+ "': it shouldn't contains space(s)!";
+        		throw std::invalid_argument( error );
+			}
         } else {}
+		
+		if 		  ( typeid( i_arg_holder_p ) == for_arg.type() ) {
+			i_arg_holder_p p = boost::any_cast< i_arg_holder_p >( for_arg );
+			// Type checking...
+			if ( typeid( p->def_value ) == value.type() ) {
+				p->def_value = boost::any_cast< int >( value );
+			} else {
+				std::string error = "Default value's type for parameter '" 
+									+ name.first 
+									+ "' must be <int>";
+				throw std::invalid_argument( error );
+			}
+		} else if ( typeid( ui_arg_holder_p ) == for_arg.type() ) {
+			ui_arg_holder_p p = boost::any_cast< ui_arg_holder_p >( for_arg );
+			// Type checking...
+			if ( typeid( p->def_value ) == value.type() ) {
+				p->def_value = boost::any_cast< unsigned int >( value );
+			} else {
+				std::string error = "Default value's type for parameter '" 
+									+ name.first 
+									+ "' must be <unsigned int>";
+				throw std::invalid_argument( error );
+			}
+		} else if ( typeid( d_arg_holder_p ) == for_arg.type() ) {
+			d_arg_holder_p p = boost::any_cast< d_arg_holder_p >( for_arg );
+			// Type checking. Note that value with type 'double'
+			// can be initialized by integer value;
+			if ( typeid( p->def_value ) == value.type() ) {
+				p->def_value = boost::any_cast< double >( value );
+			} else if ( typeid( int ) == value.type() ) {
+				p->def_value = boost::any_cast< int >( value );
+			} else if ( typeid( unsigned int ) == value.type() ) {
+				p->def_value = boost::any_cast< unsigned int >( value );
+			} else if ( typeid( float ) == value.type() ) {
+				p->def_value = boost::any_cast< float >( value );
+			} else {
+				std::string error = "Default value's type for parameter '" 
+									+ name.first 
+									+ "' must be <double>";
+				throw std::invalid_argument( error );
+			}
+		} else if ( typeid( s_arg_holder_p ) == for_arg.type() ) {
+			s_arg_holder_p p = boost::any_cast< s_arg_holder_p >( for_arg );
+			// Type checking...
+			if ( typeid( p->def_value ) == value.type() ) {
+				p->def_value = boost::any_cast< std::string >( value );
+			} else {
+				std::string error = "Default value's type for parameter '" 
+									+ name.first 
+									+ "' must be <std::string>";
+				throw std::invalid_argument( error );
+			}
+		}
+
 		return *this;
 	}
 };
-*/
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 } // namespace detail
 
-typedef detail::parameter
-		cl_param;
-
-// no typedef on 1.0rc
+typedef detail::parameter cl_param;
 
 } // namespace clp_parser
 
