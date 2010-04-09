@@ -2,7 +2,7 @@
 // File: checkers.hpp
 //
 // Copyright (C) Denis Shevchenko, 2010.
-// shev.denis@gmail.com
+// shev.denis @ gmail.com
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -72,6 +72,26 @@ template
     > 
 void check_ptr( Object* obj,
                 void (Object::*fn)( const Arg& ) ) {
+	if ( 0 == obj ) {
+        throw std::invalid_argument( "Zero pointer on object!" );
+    } else {}
+    if ( 0 == fn ) {
+        throw std::invalid_argument( "Zero pointer on object's function!" );
+    } else {}
+}
+
+/// \brief Check non-zero pointer on function.
+/// Used for POD-type values (int, double, etc).
+/// \param obj Pointer on object.
+/// \param fn Pointer on member-function (with value).
+/// \throw std::invalid_argument If pointer(s) is null. 
+template
+    < 
+    	typename Object
+    	, typename Arg
+    > 
+void check_ptr( Object* obj,
+                void (Object::*fn)( Arg ) ) {
 	if ( 0 == obj ) {
         throw std::invalid_argument( "Zero pointer on object!" );
     } else {}

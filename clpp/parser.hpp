@@ -2,7 +2,7 @@
 // File: parser.hpp
 //
 // Copyright (C) Denis Shevchenko, 2010.
-// shev.denis@gmail.com
+// shev.denis @ gmail.com
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -36,8 +36,6 @@
 /// \section download Download
 ///
 /// You can download CLPP source code from \htmlonly<b><a href="http://sourceforge.net/projects/clp-parser">SourceForge</a></b>\endhtmlonly.
-///
-/// You can also view source code in \htmlonly<b><a href="http://clp-parser.git.sourceforge.net/git/gitweb.cgi?p=clp-parser/clp-parser;a=tree>Git repository</a></b>\endhtmlonly.
 /// 
 /// \htmlonly <br/> \endhtmlonly
 ///
@@ -82,7 +80,7 @@
 /// 	// Define parameter, without value and without any checking...
 /// 	parser.add_parameter( "-h", "--help", help );
 /// 	try {
-/// 		// If user input '-h' or '--help' in command line, help() was calling.
+/// 		// If user input '-h' or '--help' in command line, help() will be calling.
 /// 		parser.parse( argc, argv );
 /// 	} catch ( const std::exception& exc ) {
 /// 		std::cerr << exc.what() << std::endl;
@@ -106,6 +104,15 @@
 /// \li Define parameter's necessity.
 /// \li Define parameter's default value.
 /// \li Define another "name-value" separator.
+///
+/// \htmlonly <br/> \endhtmlonly
+///
+///
+///
+/// \section changes Changes
+///
+/// Since <b>1.0rc</b> version removed <tt>check_type()</tt> function (it no need anymore). 
+/// See <b>User's guide</b> for more info. 
 ///
 /// \htmlonly <br/> \endhtmlonly
 ///
@@ -282,10 +289,7 @@
 /// 		void some_path( const std::string& path ) {
 /// 			// Some work with path...
 /// 		}
-/// 		void some_num( const int& number ) {
-/// 			// Some work with number...
-/// 		}
-/// 		void some_rnum( const double& rnumber ) {
+/// 		void some_rnum( double rnumber ) {
 /// 			// Some work with rnumber...
 /// 		}
 /// 	}
@@ -296,13 +300,8 @@
 /// 	
 /// 	clp_parser::command_line_parameter_parser parser;
 /// 	parser.add_parameter( "-i", "--init", &storage::init ); // Static function can be used as global function.
-/// 	parser.add_parameter( "-f", "--file", &storage, &storage::some_path )
-/// 		  .default_value( std::string( "/home/" ) )
-/// 		  ;
-/// 	parser.add_parameter( "-n", "--number", &storage, &storage::some_num );
-/// 	parser.add_parameter( "-rn", "--rnumber", &storage, &storage::some_rnum )
-/// 		  .default_value( 12.3 )
-/// 		  ;
+/// 	parser.add_parameter( "-f", "--file", &storage, &storage::some_path );
+/// 	parser.add_parameter( "-rn", "--rnumber", &storage, &storage::some_rnum );
 ///
 /// 	// ...
 ///
@@ -365,26 +364,11 @@
 /// int main( int argc, char* argv[] ) {
 /// 	clp_parser::command_line_parameter_parser parser;
 /// 	parser.add_parameter( "-c", "--config", config )
-/// 		  .default_value( std::string( "/some/default/path" ) );
+/// 		  .default_value( "/some/default/path" );
 /// 	// ...
 /// }
 /// \endcode
 /// After that user <b>must</b> input this parameter.
-///
-/// <b>Important</b>: Default values for parameters with <std::string> values <b>must</b> take 
-/// <tt>std::string</tt> object, not <tt>const char*</tt>.
-///
-/// \code
-/// std::string def_path = ""/some/default/path"";
-/// parser.add_parameter( "-c", "--config", config )
-/// 		  .default_value( def_path ); // Ok.
-///
-/// parser.add_parameter( "-c", "--config", config )
-/// 		  .default_value( std::string( "/some/default/path" ) ); // Ok.
-///
-/// parser.add_parameter( "-c", "--config", config )
-/// 		  .default_value( "/some/default/path" ); // Sadly, but error.
-/// \endcode
 ///
 /// \htmlonly <br/> \endhtmlonly
 ///
@@ -400,7 +384,7 @@
 /// 	// ...
 /// }
 /// \endcode
-/// so <tt>number</tt>'s value <b>must</b> be double type (or compatible).
+/// so <tt>number</tt>'s value <b>must</b> be double type (or compatible), if not - exception will throw.
 ///
 ///
 /// \htmlonly <br/> \endhtmlonly
@@ -453,7 +437,7 @@
 /// 	parser.add_parameter( "-l", "--log-dir", log_dir )
 /// 		  .default_value( "/some/default/path" )
 /// 		  .check_semantic( clp_parser::path )
-/// 		  .necessary() // Necessity of parameter with defined default value? Hmm...
+/// 		  .necessary() // Necessary parameter with defined default value? Hmm...
 /// 		  ;
 /// 	// ...
 /// }
@@ -599,6 +583,31 @@ public:
     }
     
     /// \brief Add new command line parameter.
+    /// Used for POD-type argument (int, double, etc).
+	/// \param short_name Short name of parameter.
+	/// \param full_name Full name of parameter.
+	/// \param fn Pointer on function (with value).
+	/// \return reference on this parameter;
+	template< typename Arg >
+    cl_param& add_parameter( const std::string& short_name
+                        	 , const std::string& full_name
+                        	 , void (*fn)( Arg ) ) {
+        detail::check_ptr( fn );
+        
+        if ( short_name == full_name ) {
+            std::string error = "Duplicate names of parameter: '"
+                                + short_name + "', '"
+                                + full_name + "'! Check your code.";
+            throw std::invalid_argument( error );
+        } else {}
+        
+        check_uniq_names( short_name, full_name ); // Is it new names?
+        m_params.push_back( new cl_param( std::make_pair( short_name, full_name )
+        								  , fn ) );
+        return m_params.back();
+    }
+    
+    /// \brief Add new command line parameter.
 	/// \param single_name Single name of parameter.
 	/// \param fn Pointer on function (without value).
 	/// \return reference on this parameter;
@@ -619,6 +628,22 @@ public:
 	template< typename Arg >
     cl_param& add_parameter( const std::string& single_name
                         	 , void (*fn)( const Arg& ) ) {
+        detail::check_ptr( fn );
+        
+        check_uniq_names( single_name ); // Is it new name?
+        m_params.push_back( new cl_param( std::make_pair( single_name, "" )
+        								  , fn ) );
+        return m_params.back();
+    }
+    
+    /// \brief Add new command line parameter.
+    /// Used for POD-type argument (int, double, etc).
+	/// \param single_name Single name of parameter.
+	/// \param fn Pointer on function (with value).
+	/// \return reference on this parameter;
+	template< typename Arg >
+    cl_param& add_parameter( const std::string& single_name
+                        	 , void (*fn)( Arg ) ) {
         detail::check_ptr( fn );
         
         check_uniq_names( single_name ); // Is it new name?
@@ -688,6 +713,38 @@ public:
         								  , fn ) );
         return m_params.back();
     }
+     
+    /// \brief Add new command line parameter.
+    /// Used for POD-type argument (int, double, etc).
+	/// \param short_name Short name of parameter.
+	/// \param full_name Full name of parameter.
+	/// \param obj Pointer to object.
+	/// \param fn Pointer on object's function (with value).
+	/// \return reference on this parameter;
+    template
+    	< 
+    		typename Object
+    		, typename Arg
+    	> 
+	cl_param& add_parameter( const std::string& short_name, 
+                        	 const std::string& full_name, 
+                        	 Object* 			obj,
+                        	 void (Object::*fn)( Arg ) ) {  
+        detail::check_ptr( obj, fn );
+        
+        if ( short_name == full_name ) {
+            std::string error = "Duplicate names of parameter: '"
+                                + short_name + "', '"
+                                + full_name + "'! Check your code.";
+            throw std::invalid_argument( error );
+        } else {}
+        
+        check_uniq_names( short_name, full_name ); // Is it new names?
+        m_params.push_back( new cl_param( std::make_pair( short_name, full_name )
+        								  , obj
+        								  , fn ) );
+        return m_params.back();
+    }
     
     /// \brief Add new command line parameter.
 	/// \param single_name Single name of parameter.
@@ -720,6 +777,29 @@ public:
 	cl_param& add_parameter( const std::string& single_name,
                         	 Object* 			obj,
                         	 void (Object::*fn)( const Arg& ) ) {  
+        detail::check_ptr( obj, fn );
+        
+        check_uniq_names( single_name ); // Is it new name?
+        m_params.push_back( new cl_param( std::make_pair( single_name, "" )
+        								  , obj
+        								  , fn ) );
+        return m_params.back();
+    }
+    
+    /// \brief Add new command line parameter.
+    /// Used for POD-type argument (int, double, etc).
+	/// \param single_name Single name of parameter.
+	/// \param obj Pointer to object.
+	/// \param fn Pointer on object's function (with value).
+	/// \return reference on this parameter;
+    template
+    	< 
+    		typename Object
+    		, typename Arg
+    	> 
+	cl_param& add_parameter( const std::string& single_name,
+                        	 Object* 			obj,
+                        	 void (Object::*fn)( Arg ) ) {  
         detail::check_ptr( obj, fn );
         
         check_uniq_names( single_name ); // Is it new name?
@@ -915,6 +995,7 @@ private:
 					if ( corresponds( param, param_name )
 					     && no_semantic != param.value_s ) {
                         (*m_vs_checker.at( param.value_s ))( retrieve( value, fact_param ) );
+                        // Not need anymore...
 					    names.erase( std::remove( names.begin()
 					    						  , names.end()
 					    						  , param.name.first )

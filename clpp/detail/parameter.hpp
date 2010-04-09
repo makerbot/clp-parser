@@ -2,7 +2,7 @@
 // File: parameter.hpp
 //
 // Copyright (C) Denis Shevchenko, 2010.
-// shev.denis@gmail.com
+// shev.denis @ gmail.com
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -76,6 +76,23 @@ public:
 		sig_with_value.connect( boost::bind( fn, obj, _1 ) );
 	}
 	
+	/// \brief Overloaded ctor for register global function with argument.
+	/// Used for POD-type argument (int, double, etc).
+	/// \param fn Pointer on function.
+	explicit arg_holder( void (*fn)( Arg ) ) {
+		sig_with_value.connect( fn );
+	}
+	
+	/// \brief Overloaded ctor for register member-function with argument.
+	/// Used for POD-type argument (int, double, etc).
+	/// \param obj Pointer on object.
+	/// \param fn Pointer on member-function.
+	template< typename Object >
+	explicit arg_holder( Object* obj
+						 , void (Object::*fn)( Arg ) ) {
+		sig_with_value.connect( boost::bind( fn, obj, _1 ) );
+	}
+	
 	/// \brief Signal for callback correspond function.
 	/// Must be used for parameters with value.
     sig_with_value_type sig_with_value;
@@ -143,6 +160,27 @@ public:
         } else {}
     }
     
+    /// \brief Overloaded ctor, for callable functions with values.
+    /// Used for POD-type values (int, double, etc).
+   	/// \param nm Parameter's name.
+   	/// \param fn Pointer on function.
+    template< typename Arg >
+    explicit parameter( const parameter_name& nm
+      					, void (*fn)( Arg ) ) :
+            name( nm )
+            , for_arg( boost::make_shared< arg_holder<Arg> >( fn ) )
+            , is_necessary( false )
+            , has_def_value( false )
+            , value_s( no_semantic ) {
+        if ( boost::contains( name.first, " " ) 
+             || boost::contains( name.second, " " ) ) {
+        	std::string error = "Invalid parameter's name '" 
+        						+ name.first 
+        						+ "', it shouldn't contains space(s)!";
+        	throw std::runtime_error( error );
+        } else {}
+    }
+    
     /// \brief Overloaded ctor, for callable object's function without values.
    	/// \param nm Parameter's name.
    	/// \param obj Pointer on object.
@@ -177,6 +215,33 @@ public:
     explicit parameter( const parameter_name& nm 
       					, T* 				  obj
       					, void (T::*fn)( const Arg& ) ) :
+            name( nm )
+            , for_arg( boost::make_shared< arg_holder<Arg> >( obj, fn ) )
+            , is_necessary( false )
+            , has_def_value( false )
+            , value_s( no_semantic ) {
+        if ( boost::contains( name.first, " " ) 
+             || boost::contains( name.second, " " ) ) {
+        	std::string error = "Invalid parameter's name '" 
+        						+ name.first 
+        						+ "', it shouldn't contains space(s)!";
+        	throw std::runtime_error( error );
+        } else {}
+    }
+    
+    /// \brief Overloaded ctor, for callable object's function with values.
+    /// Used for POD-type argument (int, double, etc).
+   	/// \param nm Parameter's name.
+   	/// \param obj Pointer on object.
+   	/// \param fn Pointer on object's function.
+    template
+    	< 
+    		typename T
+    		, typename Arg 
+    	>
+    explicit parameter( const parameter_name& nm 
+      					, T* 				  obj
+      					, void (T::*fn)( Arg ) ) :
             name( nm )
             , for_arg( boost::make_shared< arg_holder<Arg> >( obj, fn ) )
             , is_necessary( false )
@@ -308,6 +373,15 @@ public:
 		}
 
 		return *this;
+	}
+	
+	/// \brief Define parameter's default value.
+	/// Overloaded for const char* arguments,
+	/// because boost::any cannot be initialized by array.
+	/// \param value Default value.
+	/// \return *this
+	parameter& default_value( const char* value ) {
+		return default_value( std::string( value ) );
 	}
 };
 
