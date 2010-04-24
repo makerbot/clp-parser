@@ -1,30 +1,44 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This is CHANGELOG file for 'Command line parameters parser (CLPP)' library.
 
-Last update: March 20, 2010
+Last update: April 24, 2010
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-0.9.3 --> 1.0rc
+1.0rc2 --> 1.0
 
-- add support of calling functions/functions-members with "non-string" type of argument.
-- documentation correction.
+- Add support of "unnamed" parameters. See documentation.
+- Adding more understandable error messages.
+- Documentation correction.
+
+
+1.0rc --> 1.0rc2
+
+- Add ability of register function with POD-type argument in "canonical form". See documentation.
+
+
+0.9.3 --> 1.0rc (Not full backward compatibility with prev. versions)
+
+- Add ability of register function with non-string arguments,
+  with automatic check of value type. See documentation.
+- Remove check_type() function.
+- Documentation correction.
 
 
 0.9.2 --> 0.9.3
 
-- add support of calling functions-members.
-- documentation correction.
+- Add support of calling functions-members.
+- Documentation correction.
 
 
 0.9.1 --> 0.9.2
 
-- add 'example' folder with ready-to-use example of CLPP using.
-- some corrections in code (not bugfix).
-- documentation correction.
-- add some comments.
+- Add 'example' folder with ready-to-use example of CLPP using.
+- Some corrections in code (not bugfix).
+- Documentation correction.
+- Add some comments.
 
 
 0.9 --> 0.9.1
 
-- replace 'or' and 'and' on '||' and '&&' respectively (VC++ don't understand these standard construction).
-- comment unused exception objects (for suppression of warnings in VC++).
+- Replace 'or' and 'and' on '||' and '&&' respectively (VC++ don't understand these standard construction).
+- Comment unused exception objects (for suppression of warnings in VC++).

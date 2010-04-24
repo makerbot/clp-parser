@@ -24,7 +24,6 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/signals2/signal.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
@@ -32,6 +31,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 /// \namespace clp_parser
 /// \brief Main namespace of library.
@@ -115,11 +115,12 @@ struct parameter : boost::noncopyable {
     typedef boost::signals2::signal< void () >
     		sig_type;
     typedef std::pair
-    			< 
-    				std::string /* short_name */
-    				, std::string /* full_name */ 
-    			>
-            parameter_name;
+    		< 
+    			std::string /* short_name */
+    			, std::string /* full_name */ 
+    		> parameter_name;
+    typedef std::set< size_t >
+            orders_storage;
 public:
 	/// \brief Overloaded ctor, for callable functions without values.
 	/// \param nm Parameter's name.
@@ -129,7 +130,8 @@ public:
             name( nm )
             , is_necessary( false )
             , has_def_value( false )
-            , value_s( no_semantic ) {
+            , value_s( no_semantic )
+            , order_number( 0 ) {
         if ( boost::contains( name.first, " " ) 
              || boost::contains( name.second, " " ) ) {
         	std::string error = "Invalid parameter's name '" 
@@ -150,7 +152,8 @@ public:
             , for_arg( boost::make_shared< arg_holder<Arg> >( fn ) )
             , is_necessary( false )
             , has_def_value( false )
-            , value_s( no_semantic ) {
+            , value_s( no_semantic )
+            , order_number( 0 ) {
         if ( boost::contains( name.first, " " ) 
              || boost::contains( name.second, " " ) ) {
         	std::string error = "Invalid parameter's name '" 
@@ -171,7 +174,8 @@ public:
             , for_arg( boost::make_shared< arg_holder<Arg> >( fn ) )
             , is_necessary( false )
             , has_def_value( false )
-            , value_s( no_semantic ) {
+            , value_s( no_semantic )
+            , order_number( 0 ) {
         if ( boost::contains( name.first, " " ) 
              || boost::contains( name.second, " " ) ) {
         	std::string error = "Invalid parameter's name '" 
@@ -192,7 +196,8 @@ public:
             name( nm )
             , is_necessary( false )
             , has_def_value( false )
-            , value_s( no_semantic ) {
+            , value_s( no_semantic )
+            , order_number( 0 ) {
         if ( boost::contains( name.first, " " ) 
              || boost::contains( name.second, " " ) ) {
         	std::string error = "Invalid parameter's name '" 
@@ -219,7 +224,8 @@ public:
             , for_arg( boost::make_shared< arg_holder<Arg> >( obj, fn ) )
             , is_necessary( false )
             , has_def_value( false )
-            , value_s( no_semantic ) {
+            , value_s( no_semantic )
+            , order_number( 0 ) {
         if ( boost::contains( name.first, " " ) 
              || boost::contains( name.second, " " ) ) {
         	std::string error = "Invalid parameter's name '" 
@@ -246,7 +252,8 @@ public:
             , for_arg( boost::make_shared< arg_holder<Arg> >( obj, fn ) )
             , is_necessary( false )
             , has_def_value( false )
-            , value_s( no_semantic ) {
+            , value_s( no_semantic )
+            , order_number( 0 ) {
         if ( boost::contains( name.first, " " ) 
              || boost::contains( name.second, " " ) ) {
         	std::string error = "Invalid parameter's name '" 
@@ -277,6 +284,15 @@ public:
     
 	/// \brief Value's semantis label.
 	value_semantic 	value_s;
+
+    /// \brief Order number for this parameter.
+    /// Need for "unnamed using" of this parameter
+    /// (you can input it without name).
+    size_t          order_number;
+
+    /// \brief Storage for order numbers of parameters.
+    /// Need for unique-check of orders.
+    static orders_storage orders;
 public:
 	/// \brief Define parameter with semantic's checked value.
 	/// \param vs Value's semantic field.
@@ -383,7 +399,36 @@ public:
 	parameter& default_value( const char* value ) {
 		return default_value( std::string( value ) );
 	}
+
+    /// \brief Set order number for this parameter. 
+    /// Need for "unnamed using" (this parameter
+    /// can input without name).
+    /// Order number _must_ be uniq for parameters.
+    /// \param order_num Order, must be 1 or greater.
+    /// \return *this
+    parameter& order( size_t order_num ) {
+        if ( order_num < 1 ) {
+            std::string error = "Parameter's order cannot be less than 1!";
+            throw std::invalid_argument( error );
+        } else {}
+
+        // Unique order?
+        size_t prev_size = orders.size();
+        orders.insert( order_num );
+        size_t curr_size = orders.size();
+        if ( prev_size != curr_size ) {
+            // Ok, unique order.
+            order_number = order_num;
+        } else {
+            std::string error = "Parameter's order must be unique! Check your code.";
+            throw std::logic_error( error );
+        }
+
+        return *this;
+    }
 };
+
+parameter::orders_storage parameter::orders;
 
 } // namespace detail
 

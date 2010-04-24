@@ -1,4 +1,4 @@
-// Example of simplest usage of CLPP 1.0rc.
+// Example of simplest usage of CLPP 1.0.
 //
 // Copyright (C) Denis Shevchenko, 2010.
 // shev.denis @ gmail.com
@@ -19,6 +19,8 @@ int main( int argc, char* argv[] ) {
 	clp_parser::command_line_parameter_parser parser;
 	parser.add_parameter( "-h", "--help", help );
 	try {
+		// If user input '-h' or '--help' in command line,
+		// help() will be call.
 		parser.parse( argc, argv );
 	} catch ( const std::exception& exc ) {
 		std::cerr << exc.what() << std::endl;

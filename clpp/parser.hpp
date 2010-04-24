@@ -98,8 +98,9 @@
 /// \li Header-only (not need installing).
 /// \li Define parameter with two (in Unix-style) or single name of parameter.
 /// \li Call correspond functions, with or without value.
+/// \li Set unnamed parameters, which can be inputed without names.
 /// \li Common checks of inputed parameters, like duplicate, incorrect, etc.
-/// \li Checking of value's type, like integer or real (defines by registered function).
+/// \li Checking of value's type, like integer or real (defines by type of registered function's argument).
 /// \li Checking of value's semantic, like correct path.
 /// \li Define parameter's necessity.
 /// \li Define parameter's default value.
@@ -109,10 +110,10 @@
 ///
 ///
 ///
-/// \section changes Changes
+/// \section changes Backward incompatible changes
 ///
 /// Since <b>1.0rc</b> version removed <tt>check_type()</tt> function (it no need anymore). 
-/// See <b>User's guide</b> for more info. 
+/// See <b>User's guide</b> for more info.
 ///
 /// \htmlonly <br/> \endhtmlonly
 ///
@@ -181,6 +182,7 @@
 /// 		- \ref how_to_define_semantic_check
 ///         - \ref combine_of_settings
 ///         - \ref another_value_separator
+///         - \ref unnamed_params
 ///
 /// \htmlonly <br/> \endhtmlonly
 ///
@@ -467,6 +469,90 @@
 /// # ./program --log-dir:/some/path
 /// \endcode
 ///
+/// \htmlonly <br/> \endhtmlonly
+///
+/// \subsection unnamed_params Unnamed parameters
+///
+/// Sometimes you may want use parameters without explicitly inputed names.
+///
+/// For example, if you develop network program with console-defined host and port,
+/// you can use it like this:
+///
+/// \code 
+/// # ./program --host=127.0.0.1 --port=80
+/// \endcode
+/// 
+/// or like this (with another separator):
+///
+/// \code
+/// # ./program -h:127.0.0.1 -p:80
+/// \endcode
+///
+/// but you probably want use it easier:
+///
+/// \code
+/// # ./program 127.0.0.1 80
+/// \endcode
+///
+/// Use <b>order()</b> function.
+///
+/// This function sets order number of parameter, so in our example <b>'host'</b> has
+/// order number 1, and <b>'port'</b> has order number 2. Note that order number begins 
+/// with 1, because it is not <em>index</em>, but number.
+///
+/// So you must define these parameters like this:
+///
+/// \code 
+/// int main( int argc, char* argv[] ) {
+/// 	clp_parser::command_line_parameter_parser parser;
+/// 	parser.add_parameter( "-h", "--host", host )
+/// 		  .order( 1 )
+/// 		  ;
+///     parser.add_parameter( "-p", "--port", port )
+///           .order( 2 )
+///           ;
+/// 	// ...
+/// }
+/// \endcode
+///
+/// Now you can use it like this:
+///
+/// \code
+/// # ./program 127.0.0.1 80
+/// \endcode
+///
+/// but <b>not</b> vice versa:
+///
+/// \code
+/// # ./program 80 127.0.0.1
+/// \endcode
+///
+/// because in this case <b>port()</b> function get string-argument, and exception will throw.
+///
+/// Remember that order numbers must be unique:
+///
+/// \code 
+/// int main( int argc, char* argv[] ) {
+/// 	clp_parser::command_line_parameter_parser parser;
+/// 	parser.add_parameter( "-h", "--host", host )
+/// 		  .order( 1 )
+/// 		  ;
+///     parser.add_parameter( "-p", "--port", port )
+///           .order( 1 ) // Oh, you inputs already used order, throw std::logic_error.
+///           ;
+/// 	// ...
+/// }
+/// \endcode
+/// 
+/// Of course, you can use "ordered" parameters with names, in any combination:
+///
+/// \code
+/// # ./program -h=127.0.0.1 --port=80
+/// \endcode
+/// \code
+/// # ./program 127.0.0.1 -p=80
+/// \endcode
+///
 /////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef COMMAND_LINE_PARAMETERS_PARSER_HPP
@@ -477,10 +563,12 @@
 
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/unordered_map.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <set>
+#include <iostream>
 
 /// \namespace clp_parser
 /// \brief Main namespace of library.
@@ -819,6 +907,27 @@ public:
         m_value_separator = sep;
     }
 private:
+    /// \brief Check unnamed parameters.
+    /// If some fact parameter inputed without name - check
+    /// parameter with _this_ order number.
+    /// \param fact_params Container of inputed parameters.
+    void check_unnamed_params( detail::str_storage& fact_params ) {
+        for ( size_t i = 0; i < fact_params.size(); ++i ) {
+            std::string& fact_param = fact_params[i];
+            // Is this unnamed parameter?
+            if ( !boost::contains( fact_param, m_value_separator ) ) {
+                // Probably unnamed parameter.
+                // Is some unnamed parameters sets?
+                BOOST_FOREACH ( const cl_param& param, m_params ) {
+                    if ( (i + 1) == param.order_number ) {
+                        // Find.
+                        fact_param = param.name.first + m_value_separator + fact_param;
+                    } else {}
+                }
+            } else {}
+        }
+    }
+
 	/// \brief Check uniq names.
 	/// \param short_name Short name of parameter.
 	/// \param full_name Full name of parameter.
@@ -1073,6 +1182,7 @@ public:
         
         // Checks.
         check_params_redundancy( fact_params.size() );
+        check_unnamed_params( fact_params );
         check_incorrect_params( fact_params );
         check_params_repetition( fact_params );
         check_necessary_params( fact_params );
@@ -1104,17 +1214,30 @@ public:
 					                 , names.end() );
                         break;
                     } else {
-                    	// Parameter with value.                 	
+                    	// Parameter with value.
+                        std::string error = "Value of parameter '" + fact_param_name + "' must be ";
                     	if 		  ( typeid( detail::i_arg_holder_p ) == param.for_arg.type() ) {
 							detail::i_arg_holder_p p = boost::any_cast< detail::i_arg_holder_p >( param.for_arg );
-							p->sig_with_value( boost::lexical_cast< int >( fact_param_value ) );
+							try {
+                                p->sig_with_value( boost::lexical_cast< int >( fact_param_value ) );
+                            } catch ( const std::exception& /* exc */ ) {
+                                throw std::invalid_argument( error + "<int>!" );
+                            }
 						} else if ( typeid( detail::ui_arg_holder_p ) == param.for_arg.type() ) {
 							detail::ui_arg_holder_p p = boost::any_cast< detail::ui_arg_holder_p >( param.for_arg );
-							p->sig_with_value( boost::lexical_cast< unsigned int >( fact_param_value ) );
-						} else if ( typeid( detail::d_arg_holder_p ) == param.for_arg.type() ) {
+							try {
+                                p->sig_with_value( boost::lexical_cast< unsigned int >( fact_param_value ) );
+						    } catch ( const std::exception& /* exc */ ) {
+                                throw std::invalid_argument( error + "<unsigned int>!" );
+                            }
+                        } else if ( typeid( detail::d_arg_holder_p ) == param.for_arg.type() ) {
 							detail::d_arg_holder_p p = boost::any_cast< detail::d_arg_holder_p >( param.for_arg );
-							p->sig_with_value( boost::lexical_cast< double >( fact_param_value ) );
-						} else if ( typeid( detail::s_arg_holder_p ) == param.for_arg.type() ) {
+							try {
+                                p->sig_with_value( boost::lexical_cast< double >( fact_param_value ) );
+						    } catch ( const std::exception& /* exc */ ) {
+                                throw std::invalid_argument( error + "<double>!" );
+                            }
+                        } else if ( typeid( detail::s_arg_holder_p ) == param.for_arg.type() ) {
 							detail::s_arg_holder_p p = boost::any_cast< detail::s_arg_holder_p >( param.for_arg );
 							// Already std::string argument, no need lexical_cast.
 							p->sig_with_value( fact_param_value );
