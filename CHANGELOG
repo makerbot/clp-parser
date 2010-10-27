@@ -1,8 +1,18 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This is CHANGELOG file for 'Command line parameters parser (CLPP)' library.
 
-Last update: April 24, 2010
+Last update: October 27, 2010
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1.0 --> 2.0
+
+- Fix many bugs.
+- Full refactoring of source code.
+- Adding support of all standard types for parameters with value. See documentation.
+- Adding support of 'const' member-function for parameters. See documentation.
+- Error notifications correction.
+- Documentation, comments and examples full correction.
+
 
 1.0rc2 --> 1.0
 

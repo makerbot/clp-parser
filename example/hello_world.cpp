@@ -1,4 +1,4 @@
-// Example of simplest usage of CLPP 1.0.
+// Example of simplest usage of CLPP library.
 //
 // Copyright (C) Denis Shevchenko, 2010.
 // shev.denis @ gmail.com
@@ -7,28 +7,21 @@
 
 #include <iostream>
 
-namespace {
-	void help() {
-		std::cout << "Help info..." << std::endl;
-		::exit( 0 );
-	}
+void help() {
+	std::cout << "Some help info..." << std::endl;
+	::exit( 0 );
 }
 
 int main( int argc, char* argv[] ) {
-	{
-	clp_parser::command_line_parameter_parser parser;
+	clpp::command_line_parameters_parser parser;
 	parser.add_parameter( "-h", "--help", help );
 	try {
-		// If user input '-h' or '--help' in command line,
-		// help() will be call.
 		parser.parse( argc, argv );
+		// If user inputs '-h' or '--help' in command line,
+		// function 'help()' will be called.
 	} catch ( const std::exception& exc ) {
 		std::cerr << exc.what() << std::endl;
 	}
-	} // At exit from scope parser will destroy, because it no need anymore.
-	  // All obtained resources will be free.
-	
-	// ...
 	
 	return 0;
 }

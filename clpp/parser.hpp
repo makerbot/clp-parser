@@ -1,5 +1,4 @@
 // Command line parameters parser.
-// File: parser.hpp
 //
 // Copyright (C) Denis Shevchenko, 2010.
 // shev.denis @ gmail.com
@@ -25,9 +24,9 @@
 ///
 /// \section about About
 ///
-/// This document describes <b>'Command line parameters parser'</b> library. It provides parsing 
-/// of command line parameters, with callback correspond functions and, if necessary, checking 
-/// parameter's value semantic.
+/// This document describes <b>'Command line parameters parser'</b> library. Library provides parsing 
+/// of command line parameters, with callback corresponding functions and, if necessary, checking 
+/// of parameter's values semantic.
 ///
 /// \htmlonly <br/> \endhtmlonly
 ///
@@ -50,14 +49,14 @@
 ///
 ///
 /// \section motivation Motivation
-/// \htmlonly <p style="text-align: right"><strong><em>"Don't invent bicycle"</em></strong></p> \endhtmlonly
+/// \htmlonly <p style="text-align: right"><strong><em>"Don't reinvent the wheel"</em></strong></p> \endhtmlonly
 ///
-/// Almost every "console-start" program required some command line parameters, so it handling 
+/// Almost every "console-start" program requires input of some command line parameters, so it handling 
 /// is very common task. Actually, this handling add up to two tasks:
 /// \li check correctness (in all senses of this word) of inputed parameters,
 /// \li some reaction(s) on it.
 ///
-/// CLPP library provides general solution for this tasks. It very simple to use. 
+/// CLPP library provides general solution for this tasks. It very easy to use.
 /// 
 /// \htmlonly <br/> \endhtmlonly
 /// 
@@ -68,24 +67,27 @@
 /// Simplest example of CLPP using:
 ///
 /// \code
-/// namespace {
-/// 	void help() {
-/// 		std::cout << "My program, version 1.0. Common usage is..." << std::endl;
-/// 		// ...
-/// 	}
+/// #include <clpp/parser.hpp>
+///
+/// #include <iostream>
+/// 
+/// void help() {
+///     std::cout << "My program, version 1.0. Common usage is..." << std::endl;
+///     //
 /// }
 /// 
 /// int main( int argc, char* argv[] ) {
-/// 	clp_parser::command_line_parameter_parser parser;
-/// 	// Define parameter, without value and without any checking...
-/// 	parser.add_parameter( "-h", "--help", help );
-/// 	try {
-/// 		// If user input '-h' or '--help' in command line, help() will be calling.
-/// 		parser.parse( argc, argv );
-/// 	} catch ( const std::exception& exc ) {
-/// 		std::cerr << exc.what() << std::endl;
-/// 	}
-/// 	return 0;
+///     clpp::command_line_parameters_parser parser;
+///     // Register parameter, without value and without any checking...
+///     parser.add_parameter( "-h", "--help", help );
+///     try {
+///         parser.parse( argc, argv );
+///         // If user inputs '-h' or '--help' in command line, function 'help()' will be called.
+///     } catch ( const std::exception& exc ) {
+///         std::cerr << exc.what() << std::endl;
+///     }
+/// 
+///     return 0;
 /// } 
 /// \endcode
 ///
@@ -95,13 +97,13 @@
 ///
 /// \section features Features
 ///
-/// \li Header-only (not need installing).
-/// \li Define parameter with two (in Unix-style) or single name of parameter.
-/// \li Call correspond functions, with or without value.
-/// \li Set unnamed parameters, which can be inputed without names.
-/// \li Common checks of inputed parameters, like duplicate, incorrect, etc.
+/// \li Header-only (does not require build).
+/// \li Register parameters with two (in Unix-style) or single names.
+/// \li Calls correspond functions, with or without argument.
+/// \li Register unnamed parameters that can be inputed without names.
+/// \li Provides common checks of inputed parameters, like duplication, incorrect, etc.
 /// \li Checking of value's type, like integer or real (defines by type of registered function's argument).
-/// \li Checking of value's semantic, like correct path.
+/// \li Checking of value's semantic, like correct path, etc.
 /// \li Define parameter's necessity.
 /// \li Define parameter's default value.
 /// \li Define another "name-value" separator.
@@ -112,7 +114,7 @@
 ///
 /// \section changes Backward incompatible changes
 ///
-/// Since <b>1.0rc</b> version removed <tt>check_type()</tt> function (it no need anymore). 
+/// Since <b>1.0rc</b> version function <tt>check_type()</tt> has been removed (it no need anymore). 
 /// See <b>User's guide</b> for more info.
 ///
 /// \htmlonly <br/> \endhtmlonly
@@ -121,7 +123,7 @@
 ///
 /// \section acknowledgements Acknowledgements
 ///
-/// I'm very grateful to \htmlonly<b><a href="http://www2.research.att.com/~bs/">Bjarne Stroustrup</a></b>\endhtmlonly, who invent so beautiful, so powerful and so dangerous language!
+/// I'm very grateful to \htmlonly<b><a href="http://www2.research.att.com/~bs/">Bjarne Stroustrup</a></b>\endhtmlonly, who invented so beautiful, so powerful and so dangerous language!
 /// 
 /// Also I grateful to all authors of \htmlonly<b><a href="http://www.boost.org/">Boost C++ libraries</a></b>\endhtmlonly. Thank you for your work!
 /// 
@@ -137,29 +139,30 @@
 ///
 /// There is only "one" dependency - \htmlonly<b><a href="http://www.boost.org/">Boost C++ libraries</a></b>\endhtmlonly.
 /// 
-/// Strictly speacking, CLPP used 
-/// only following libraries:
-/// \li <b>Boost.Any</b>  
-/// \li <b>Boost.Signals2</b>
-/// \li <b>Boost.Lexical_cast</b>  
-/// \li <b>Boost.Bind</b>  
-/// \li <b>Boost.Foreach</b>  
-/// \li <b>Boost.Ptr_container</b>  
-/// \li <b>Boost.Asio</b>
+/// Strictly speacking, CLPP use following libraries:
+/// \li <b>Boost.Any</b>
+/// \li <b>Boost.Assign</b>
+/// \li <b>Boost.Utility</b>
+/// \li <b>Boost.Ptr_container</b>
+/// \li <b>Boost.Lexical_cast</b>
 /// \li <b>Boost.Algorithm</b>
-/// \li <b>Boost.Unordered</b>
+/// \li <b>Boost.Bind</b>
+/// \li <b>Boost.Foreach</b>
+/// \li <b>Boost.Asio</b>
 /// \li <b>Boost.Smart_ptr</b>
-/// \li <b>Boost.Filesystem</b>  
+/// \li <b>Boost.Function</b>
+/// \li <b>Boost.Filesystem</b>
+/// \li <b>Boost.System</b>
 ///
 /// Full list of Boost C++ libraries see \htmlonly<b><a href="http://www.boost.org/doc/libs">there</a></b>\endhtmlonly.
 ///
-/// All used libraries are <b>header-only</b>, except <em>Boost.Filesystem</em>, so you must build 
-/// <em>Boost.Filesystem</em> library and link it with your programm.
+/// All used libraries are <b>header-only</b>, except <em>Boost.Filesystem</em> and <em>Boost.System</em>, 
+/// so you must build these libraries and link it with your program.
 ///
 /// However, if you using C++ professionally, you (in my humble opinion) <em><b>must</b></em> have 
 /// Boost C++ libraries. So just download full package from \htmlonly<b><a href="http://www.boost.org/users/download/">there</a></b>\endhtmlonly, install it and enjoy!
 ///
-/// Note: If you using Windows - see http://www.boostpro.com/download.
+/// Note: If you use Windows - see http://www.boostpro.com/download.
 ///
 /////////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -170,11 +173,13 @@
 ///         - \ref value_or_not_value
 /// 		- \ref necessity
 /// 		- \ref default_val
+///         - \ref error_reports
 ///     - \ref common_usage
 /// 		- \ref preparing
 /// 		- \ref defining_parameter
 /// 		- \ref member_functions
 /// 		- \ref parsing
+///         - \ref function_arg_types
 ///     - \ref advanced_usage
 ///         - \ref how_to_define_necessity
 ///         - \ref how_to_define_default_value
@@ -184,21 +189,19 @@
 ///         - \ref another_value_separator
 ///         - \ref unnamed_params
 ///
-/// \htmlonly <br/> \endhtmlonly
-///
 /// \htmlonly <hr/> \endhtmlonly
 /// 
 /// \section introduction Introduction
 ///
 /// Factually, using CLPP library add up to only two tasks:
-/// \li <b>defining</b> set of parameters, with specify all required checkings and characteristics,
-/// \li <b>parsing</b> inputed parameter(s), with defined checking and calling correspond functions.
+/// \li <b>registration</b> set of parameters, with definition all required checkings and characteristics,
+/// \li <b>parsing</b> inputed parameter(s), with defined check(s) and calls of  corresponding functions.
 /// 
 /// \htmlonly <br/> \endhtmlonly
 ///
 /// \subsection value_or_not_value Value or not value?
 /// 
-/// Command line parameter can have value or haven't.
+/// Command line parameter can be with or without value.
 /// 
 /// Example of parameter without value:
 /// \code
@@ -210,7 +213,7 @@
 /// \code
 /// # ./program --log-dir=/some/path
 /// \endcode
-/// Parameter <b>'--log-dir'</b> is useless without value.
+/// Parameter <b>'--log-dir'</b>, in contrast, useless without value.
 ///
 /// \htmlonly <br/> \endhtmlonly
 ///
@@ -219,20 +222,28 @@
 /// Command line parameter can be necessary or optionally.
 /// 
 /// In examples above parameter <b>'--help'</b> is optionally, because it may missing 
-/// (only if user wants to view help info, he input '--help').
+/// (only in cases where user want to see help info, he input '--help').
 /// 
-/// But parameter <b>'--log-dir'</b> <em>may be</em> necessary, so user <em>must</em> input it.
+/// But parameter <b>'--log-dir'</b> <em>may be</em> necessary, in this case user <em>must</em> input it.
 ///
 /// \htmlonly <br/> \endhtmlonly
 ///
 /// \subsection default_val Default value
 ///
-/// Command line parameter can have default value, so not required input it.
-/// This option can be useful for some paths, where defined default value:
+/// Command line parameter can have default value, in this case not required input it.
+/// This option can be useful for parameters with predefined default values.
 /// 
-/// In example above parameter <b>'--log-dir'</b> may have default value of path, so user can miss it.
-/// 
+/// In example above parameter <b>'--log-dir'</b> may have default value of path, so user can skip it.
+///
 /// \htmlonly <br/> \endhtmlonly
+///
+/// \subsection error_reports Error reports
+/// 
+/// All reports about errors begins with <b>[CLPP]</b> prefix, for example:
+/// 
+/// \code
+/// [CLPP] You inputs 3 parameters, but only 2 registered! 
+/// \endcode
 ///
 /// \htmlonly <hr/> \endhtmlonly
 ///
@@ -244,35 +255,41 @@
 ///
 /// \subsection preparing Preparing
 ///
-/// Copy 'clpp' folder in some place where your compiler searches header files, and after that add:
+/// Copy 'clpp' folder in some place where your compiler is looking for header files and add:
 ///
 /// \code #include <clpp/parser.hpp> \endcode
 ///
 /// in your program.
 ///
-/// For simplicity, you can also add: 
+/// For simplicity, you can also add:
 /// 
-/// \code using namespace clp_parser; \endcode
+/// \code using namespace clpp; \endcode
+///
+/// Note: In old versions of library used namespace <b>clp_parser</b>, but backward compatibility is maintained.
 ///
 /// \htmlonly <br/> \endhtmlonly
 ///
 /// \subsection defining_parameter Defining command line parameter
 ///
-/// Defining of new parameter included three tasks:
-/// \li define parameter's name (short and full names, or sungle name),
-/// \li register function that will be called if correspond parameter inputed,
+/// Registration of new parameter included three tasks:
+/// \li define parameter's name (short and full names, or single name),
+/// \li define function that will be called if corresponding parameter will be inputed,
 /// \li define checks and default value for parameter <em>(optionally)</em>.
 ///
-/// Use for it <b>add_parameter</b> function.
+/// Use <b>clpp::command_line_parameters_parser::add_parameter()</b> function for it.
 ///
 /// \code
+///
+/// void help() { /* some info */ }
+/// void config() { /* some config info */ }
+/// 
 /// int main( int argc, char* argv[] ) {
-/// 	clp_parser::command_line_parameter_parser parser;
-/// 	// Define parameter with two names (in Unix-style) and register function help().
-/// 	parser.add_parameter( "-h", "--help", help );
-/// 	// Define parameter with single name and register function config().
-/// 	parser.add_parameter( "--config", config );
-/// 	// ...
+///     clpp::command_line_parameters_parser parser;
+///     // Register parameter with two names (in Unix-style) and 'help()' function.
+///     parser.add_parameter( "-h", "--help", help );
+///     // Register parameter with single name and 'config()' function.
+///     parser.add_parameter( "--config", config );
+///     // ...
 /// }
 /// \endcode
 ///
@@ -283,31 +300,18 @@
 /// You can register not only global functions, but also functions-members.
 ///
 /// \code
-/// namespace {
-/// 	struct some_parameters_storage {
-/// 		static void init() {
-/// 			// Some init actions...
-/// 		}
-/// 		void some_path( const std::string& path ) {
-/// 			// Some work with path...
-/// 		}
-/// 		void some_rnum( double rnumber ) {
-/// 			// Some work with rnumber...
-/// 		}
-/// 	}
+/// struct some_parameters_storage {
+///     void some_path( const std::string& path ) { /* Some work with path... */ }
+///     void some_num( double number ) { /* Some work with number... */ }
 /// }
 ///
 /// int main( int argc, char* argv[] ) {
-/// 	some_parameters_storage storage;
+///     some_parameters_storage storage;
 /// 	
-/// 	clp_parser::command_line_parameter_parser parser;
-/// 	parser.add_parameter( "-i", "--init", &storage::init ); // Static function can be used as global function.
-/// 	parser.add_parameter( "-f", "--file", &storage, &storage::some_path );
-/// 	parser.add_parameter( "-rn", "--rnumber", &storage, &storage::some_rnum );
-///
-/// 	// ...
-///
-/// 	return 0;
+///     clpp::command_line_parameters_parser parser;
+///     parser.add_parameter( "-f", "--file", &storage, &some_parameters_storage::some_path );
+///     parser.add_parameter( "-n", "--number", &storage, &some_parameters_storage::some_num );
+///     // ...
 /// }
 /// \endcode
 ///
@@ -315,26 +319,45 @@
 ///
 /// \subsection parsing Parsing
 ///
-/// For parsing call <b>parse</b> function.
+/// For parsing use <b>clpp::command_line_parameters_parser::parse()</b> function.
 ///
 /// \code
 /// int main( int argc, char* argv[] ) {
-/// 	clp_parser::command_line_parameter_parser parser;
-/// 	// ...
-/// 	try {
-/// 		parser.parse( argc, argv );
-/// 	} catch ( const std::exception& exc ) {
-/// 		std::cerr << exc.what() << std::endl;
-/// 	}
-///
-/// 	return 0;
+///     clpp::command_line_parameters_parser parser;
+///     // ...
+///     try {
+///         parser.parse( argc, argv );
+///     } catch ( const std::exception& exc ) {
+///         std::cerr << exc.what() << std::endl;
+///     }
+///     // ...
 /// }
 /// \endcode
 ///
-/// This function parse all inputed command line parameters, checks it correctness
-/// and callback correspond functions.
+/// This function parse all inputed command line parameters, 
+/// checks correctness and calls corresponding functions.
 ///
 /// \htmlonly <br/> \endhtmlonly
+///
+/// \subsection function_arg_types Supported types of user's function argument
+/// 
+/// When you register parameter with value, you can use follow types of function's argument:
+/// \li almost all standard C++-types (see below), 
+/// \li std::string.
+///
+/// You CANNOT use <b>const char*</b> and <b>wchar_t</b> argument.
+/// But this limitation, in my humble opinion, is not the real problem.
+///
+/// You can pass argument by value, like this:
+/// \code
+/// void f( int i ) { /* some work... */ }
+/// \endcode
+/// or by const reference:
+/// \code
+/// void f( const std::string& path ) { /* some work... */ }
+/// \endcode
+///
+/// Passing by non-const reference is NOT supported (I think this is completely unnecessary).
 ///
 /// \htmlonly <hr/> \endhtmlonly
 ///
@@ -346,31 +369,37 @@
 ///
 /// \subsection how_to_define_necessity Define parameter's necessity
 /// 
-/// Parameter's necessity defines by calling <b>necessary()</b> function:
+/// For define parameter's necessity use <b>clpp::parameter::necessary()</b> function:
 /// \code
+///
+/// void config( const std::string& path ) { /* some config info */ }
+///
 /// int main( int argc, char* argv[] ) {
-/// 	clp_parser::command_line_parameter_parser parser;
-/// 	parser.add_parameter( "-c", "--config", config )
-/// 		  .necessary();
-/// 	// ...
+///     clpp::command_line_parameters_parser parser;
+///     parser.add_parameter( "-c", "--config", config )
+///           .necessary();
+///     // ...
 /// }
 /// \endcode
-/// After that user <b>must</b> input this parameter in command line.
+/// After that user <b>must</b> inputs this parameter in command line.
 /// 
 /// \htmlonly <br/> \endhtmlonly
 ///
 /// \subsection how_to_define_default_value Define parameter's default value
 /// 
-/// Parameter's default value defines by calling <b>default_value()</b> function:
+/// For set parameter's default value use <b>clpp::parameter::default_value()</b> function:
 /// \code
+///
+/// void config( const std::string& path ) { /* some config info */ }
+///
 /// int main( int argc, char* argv[] ) {
-/// 	clp_parser::command_line_parameter_parser parser;
-/// 	parser.add_parameter( "-c", "--config", config )
-/// 		  .default_value( "/some/default/path" );
-/// 	// ...
+///     clpp::command_line_parameters_parser parser;
+///     parser.add_parameter( "-c", "--config", config )
+///           .default_value( "/some/default/path" );
+///     // ...
 /// }
 /// \endcode
-/// After that user <b>must</b> input this parameter.
+/// After that user <b>can skip</b> this parameter in command line.
 ///
 /// \htmlonly <br/> \endhtmlonly
 ///
@@ -378,34 +407,58 @@
 ///
 /// Since <b>1.0rc</b> version value's type checks automatically. If you register callback function
 /// \code
-/// void some_num( const double& num );
+/// void some_num( double num ) { /* some work... */ }
 ///
 /// int main( int argc, char* argv[] ) {
-/// 	clp_parser::command_line_parameter_parser parser;
-/// 	parser.add_parameter( "-n", "--number", some_num );
-/// 	// ...
+///     clpp::command_line_parameters_parser parser;
+///     parser.add_parameter( "-n", "--number", some_num );
+///     // ...
 /// }
 /// \endcode
-/// so <tt>number</tt>'s value <b>must</b> be double type (or compatible), if not - exception will throw.
+/// so <tt>number</tt>'s value <b>must</b> be 'double' type.
 ///
+/// Note: if you want use function with 'float' argument, like this:
+///
+/// \code
+/// void some_num( float num ) { /* some work... */ }
+/// \endcode
+/// AND use 'default_value()' function, you must indicate exactly 'float' type, like this:
+///
+/// \code
+///     // ...
+///     parser.add_parameter( "-n", "--number", some_num )
+///           .default_value( 12.56f )
+///           ;
+///     // ...
+/// \endcode
+/// or like this:
+///
+/// \code
+///     // ...
+///     parser.add_parameter( "-n", "--number", some_num )
+///           .default_value( float( 12.56 ) )
+///           ;
+///     // ...
+/// \endcode
 ///
 /// \htmlonly <br/> \endhtmlonly
 ///
 /// \subsection how_to_define_semantic_check Parameter's value semantic check
 ///
-/// Use <b>check_semantic()</b> function.
+/// Use <b>clpp::parameter::check_semantic()</b> function.
 ///
 /// \code
+/// void log_dir( const std::string& path_to_log ) { /* some work... */ }
+///
 /// int main( int argc, char* argv[] ) {
-/// 	clp_parser::command_line_parameter_parser parser;
-/// 	parser.add_parameter( "-l", "--log-dir", log_dir )
-/// 		  .check_semantic( clp_parser::path );
-/// 	// ...
+///     clpp::command_line_parameters_parser parser;
+///     parser.add_parameter( "-l", "--log-dir", log_dir )
+///           .check_semantic( clpp::path );
+///     // ...
 /// }
 /// \endcode
 /// 
 /// In this case, value of <b>'--log-dir'</b> <em>must</em> be valid path in current filesystem.
-/// If not, correspond std::exception will be throw.
 ///
 /// Supported value's semantic:
 /// \li <b>path</b> (check of path correctness, in current filesystem),
@@ -417,31 +470,35 @@
 ///
 /// \subsection combine_of_settings Combine of settings
 ///
-/// You can combine settings for parameter, like this:
+/// Of course, you can combine settings for one parameter, like this:
 ///
 /// \code 
+/// void log_dir( const std::string& path_to_log ) { /* some work... */ } 
+///
 /// int main( int argc, char* argv[] ) {
-/// 	clp_parser::command_line_parameter_parser parser;
-/// 	parser.add_parameter( "-l", "--log-dir", log_dir )
-/// 		  .default_value( "/some/default/path" )
-/// 		  .check_semantic( clp_parser::path )
-/// 		  ;
-/// 	// ...
+///     clpp::command_line_parameters_parser parser;
+///     parser.add_parameter( "-l", "--log-dir", log_dir )
+///           .default_value( "/some/default/path" )
+///           .check_semantic( clpp::path )
+///           ;
+///     // ...
 /// }
 /// \endcode
 ///
 /// <b>Note:</b> You cannot combine <em>contradictory</em> settings. For example, if you 
 /// write like this:
 ///
-/// \code 
+/// \code
+/// void log_dir( const std::string& path_to_log ) { /* some work... */ }
+/// 
 /// int main( int argc, char* argv[] ) {
-/// 	clp_parser::command_line_parameter_parser parser;
-/// 	parser.add_parameter( "-l", "--log-dir", log_dir )
-/// 		  .default_value( "/some/default/path" )
-/// 		  .check_semantic( clp_parser::path )
-/// 		  .necessary() // Necessary parameter with defined default value? Hmm...
-/// 		  ;
-/// 	// ...
+///     clpp::command_line_parameters_parser parser;
+///     parser.add_parameter( "-l", "--log-dir", log_dir )
+///           .default_value( "/some/default/path" )
+///           .check_semantic( clpp::path )
+///           .necessary() // Necessary parameter with defined default value?? Hmm...
+///           ;
+///     // ...
 /// }
 /// \endcode
 /// 
@@ -453,27 +510,30 @@
 ///
 /// You can define another 'name-value' separator, instead default <b>'='</b>.
 /// 
-/// Use <b>set_value_separator()</b> function.
+/// Use <b>clpp::command_line_parameters_parser::set_value_separator()</b> function.
 ///
 /// \code
 /// int main( int argc, char* argv[] ) {
-/// 	clp_parser::command_line_parameter_parser parser;
-/// 	// ...
-/// 	parser.set_value_separator( ':' );
+///     clpp::command_line_parameters_parser parser;
+///     parser.set_value_separator( ':' );
+///     // ...
 /// }
 /// \endcode
 ///
-/// In this case, parameters with value <b>must</b> be input as:
+/// In this case, parameters with value <b>must</b> be input in command line like this:
 ///
 /// \code 
 /// # ./program --log-dir:/some/path
 /// \endcode
 ///
+/// Note: You CANNOT use characters with ASCII-code less than 0x21. 
+/// They are unsuitable candidates for the separator role. :-)
+///
 /// \htmlonly <br/> \endhtmlonly
 ///
 /// \subsection unnamed_params Unnamed parameters
 ///
-/// Sometimes you may want use parameters without explicitly inputed names.
+/// Sometimes you may want to use some parameters without explicitly inputed names.
 ///
 /// For example, if you develop network program with console-defined host and port,
 /// you can use it like this:
@@ -481,37 +541,40 @@
 /// \code 
 /// # ./program --host=127.0.0.1 --port=80
 /// \endcode
-/// 
-/// or like this (with another separator):
 ///
-/// \code
-/// # ./program -h:127.0.0.1 -p:80
-/// \endcode
-///
-/// but you probably want use it easier:
+/// but you probably want to use it easier:
 ///
 /// \code
 /// # ./program 127.0.0.1 80
 /// \endcode
 ///
-/// Use <b>order()</b> function.
+/// Use <b>clpp::parameter::order()</b> function.
 ///
-/// This function sets order number of parameter, so in our example <b>'host'</b> has
+/// This function sets order number for parameter, so in our example <b>'host'</b> has
 /// order number 1, and <b>'port'</b> has order number 2. Note that order number begins 
-/// with 1, because it is not <em>index</em>, but number.
+/// with 1, because it is not <em>index</em>, but exactly number. 
+/// 
+/// Of course, order number cannot be negative.
 ///
-/// So you must define these parameters like this:
+/// So you must register these parameters like this:
 ///
-/// \code 
+/// \code
+/// struct my_server {
+///     void host( const std::string& address ) { /* some work... */ }
+///     void port( unsigned int some_port ) { /* some work... */ }
+/// };
+///
 /// int main( int argc, char* argv[] ) {
-/// 	clp_parser::command_line_parameter_parser parser;
-/// 	parser.add_parameter( "-h", "--host", host )
-/// 		  .order( 1 )
-/// 		  ;
-///     parser.add_parameter( "-p", "--port", port )
+///     my_server server;
+///     
+///     clpp::command_line_parameters_parser parser;
+///     parser.add_parameter( "-h", "--host", &server, &my_server::host )
+///           .order( 1 )
+///           ;
+///     parser.add_parameter( "-p", "--port", &server, &my_server::port )
 ///           .order( 2 )
 ///           ;
-/// 	// ...
+///     // ...
 /// }
 /// \endcode
 ///
@@ -527,21 +590,19 @@
 /// # ./program 80 127.0.0.1
 /// \endcode
 ///
-/// because in this case <b>port()</b> function get string-argument, and exception will throw.
+/// because in this case <b>my_server::port()</b> function get string-argument, and exception will throw.
 ///
 /// Remember that order numbers must be unique:
 ///
 /// \code 
-/// int main( int argc, char* argv[] ) {
-/// 	clp_parser::command_line_parameter_parser parser;
-/// 	parser.add_parameter( "-h", "--host", host )
-/// 		  .order( 1 )
-/// 		  ;
-///     parser.add_parameter( "-p", "--port", port )
-///           .order( 1 ) // Oh, you inputs already used order, throw std::logic_error.
+///     // ...
+///     parser.add_parameter( "-h", "--host", &server, &my_server::host )
+///           .order( 1 )
 ///           ;
-/// 	// ...
-/// }
+///     parser.add_parameter( "-p", "--port", &server, &my_server::port )
+///           .order( 1 ) // You inputed already used order?? Hmm...
+///           ;
+///     // ...
 /// \endcode
 /// 
 /// Of course, you can use "ordered" parameters with names, in any combination:
@@ -555,730 +616,397 @@
 ///
 /////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef COMMAND_LINE_PARAMETERS_PARSER_HPP
-#define COMMAND_LINE_PARAMETERS_PARSER_HPP
+#ifndef CLPP_PARSER_HPP
+#define CLPP_PARSER_HPP
 
-#include "detail/checkers.hpp"
+#include "detail/checkers/all.hpp"
+#include "detail/user_functions_caller.hpp"
+#include "detail/unnamed_parameters_handler.hpp"
 #include "detail/parameter.hpp"
+#include "detail/misc.hpp"
 
+#include <boost/noncopyable.hpp>
+#include <boost/assign.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/unordered_map.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
 
-#include <set>
-#include <iostream>
-
-/// \namespace clp_parser
+/// \namespace clpp
 /// \brief Main namespace of library.
-namespace clp_parser {
+namespace clpp {
 
-/// \class command_line_parameter_parser
+using namespace boost::assign;
+
+/// \class command_line_parameters_parser
 /// \brief Parser.
 ///
 /// Presents parsing functionality.
-class command_line_parameter_parser : boost::noncopyable {
-private:
-    typedef boost::ptr_vector< cl_param >
-            params_storage;
-    
-    typedef boost::signals2::signal< void ( const std::string& /* value */ ) >
-            sig_checker;
-    typedef boost::shared_ptr< sig_checker > 
-            sig_checker_p;
-    typedef boost::unordered_map< value_semantic, sig_checker_p >
-            value_semantic_checker;
-
-    /// \enum parameter_part
-    /// \brief Parameter's part.
-    enum parameter_part { 
-    	name 		/*!< Name part. */
-    	, value 	/*!< Value part. */
-    };
+class command_line_parameters_parser : boost::noncopyable {
+    typedef detail::common_checker< parameters, detail::parameter_parts_extractor, std::string > checker;
+    typedef boost::ptr_vector< checker >    common_checkers;
+    typedef common_checkers::iterator       checker_it;
+    typedef common_checkers::const_iterator checker_const_it;
 public:
-    explicit command_line_parameter_parser() : 
-    		m_value_separator( "=" ) {
-        // Register checkers of value's semantic.
-        m_vs_checker[ path ] = boost::make_shared< sig_checker >();
-        m_vs_checker[ path ]->connect( detail::check_path_validity );
-
-        m_vs_checker[ ipv4 ] = boost::make_shared< sig_checker >();
-        m_vs_checker[ ipv4 ]->connect( detail::check_ipv4_validity );
-
-        m_vs_checker[ ipv6 ] = boost::make_shared< sig_checker >();
-        m_vs_checker[ ipv6 ]->connect( detail::check_ipv6_validity );
-
-        m_vs_checker[ ip ] = boost::make_shared< sig_checker >();
-        m_vs_checker[ ip ]->connect( detail::check_ip_validity );
-}
-private:
-	/// \brief Parameter's storage.
-    params_storage 	        m_params;
-    
-    /// \brief Value separator.
-    /// Default value is '=', in Unix-style.
-    std::string 	        m_value_separator;
-
-    /// \brief Checker of parameter's semantic.
-    value_semantic_checker  m_vs_checker;
+    command_line_parameters_parser() : 
+    		name_value_separator( "=" ) {} 
 public:
-	/// \brief Add new command line parameter.
-	/// \param short_name Short name of parameter.
-	/// \param full_name Full name of parameter.
-	/// \param fn Pointer on function (without value).
-	/// \return reference on this parameter;
-    cl_param& add_parameter( const std::string& short_name
+    parameter& add_parameter( const std::string& short_name
                         	 , const std::string& full_name
-                        	 , void (*fn)() ) {
-        detail::check_ptr( fn );
-        
-        if ( short_name == full_name ) {
-            std::string error = "Duplicate names of parameter: '"
-                                + short_name + "', '"
-                                + full_name + "'! Check your code.";
-            throw std::invalid_argument( error );
-        } else {}
-        
-        check_uniq_names( short_name, full_name ); // Is it new names?
-        m_params.push_back( new cl_param( std::make_pair( short_name, full_name )
-        								  , fn ) );
-        return m_params.back();
+                        	 , void ( *fn )() ) {
+        return create_parameter( short_name, full_name, fn );
     }
     
-    /// \brief Add new command line parameter.
-	/// \param short_name Short name of parameter.
-	/// \param full_name Full name of parameter.
-	/// \param fn Pointer on function (with value).
-	/// \return reference on this parameter;
-	template< typename Arg >
-    cl_param& add_parameter( const std::string& short_name
+	template< typename ArgType >
+    parameter& add_parameter( const std::string& short_name
                         	 , const std::string& full_name
-                        	 , void (*fn)( const Arg& ) ) {
-        detail::check_ptr( fn );
-        
-        if ( short_name == full_name ) {
-            std::string error = "Duplicate names of parameter: '"
-                                + short_name + "', '"
-                                + full_name + "'! Check your code.";
-            throw std::invalid_argument( error );
-        } else {}
-        
-        check_uniq_names( short_name, full_name ); // Is it new names?
-        m_params.push_back( new cl_param( std::make_pair( short_name, full_name )
-        								  , fn ) );
-        return m_params.back();
+                        	 , void ( *fn )( const ArgType& ) ) {
+        return create_parameter( short_name, full_name, fn );
     }
     
-    /// \brief Add new command line parameter.
-    /// Used for POD-type argument (int, double, etc).
-	/// \param short_name Short name of parameter.
-	/// \param full_name Full name of parameter.
-	/// \param fn Pointer on function (with value).
-	/// \return reference on this parameter;
-	template< typename Arg >
-    cl_param& add_parameter( const std::string& short_name
+	template< typename ArgType >
+    parameter& add_parameter( const std::string& short_name
                         	 , const std::string& full_name
-                        	 , void (*fn)( Arg ) ) {
-        detail::check_ptr( fn );
-        
-        if ( short_name == full_name ) {
-            std::string error = "Duplicate names of parameter: '"
-                                + short_name + "', '"
-                                + full_name + "'! Check your code.";
-            throw std::invalid_argument( error );
-        } else {}
-        
-        check_uniq_names( short_name, full_name ); // Is it new names?
-        m_params.push_back( new cl_param( std::make_pair( short_name, full_name )
-        								  , fn ) );
-        return m_params.back();
+                        	 , void ( *fn )( ArgType ) ) {
+        return create_parameter( short_name, full_name, fn );
     }
     
-    /// \brief Add new command line parameter.
-	/// \param single_name Single name of parameter.
-	/// \param fn Pointer on function (without value).
-	/// \return reference on this parameter;
-    cl_param& add_parameter( const std::string& single_name
-                        	 , void (*fn)() ) {
-        detail::check_ptr( fn );
-        
-        check_uniq_names( single_name ); // Is it new name?
-        m_params.push_back( new cl_param( std::make_pair( single_name, "" )
-        								  , fn ) );
-        return m_params.back();
+    parameter& add_parameter( const std::string& single_name
+                              , void ( *fn )() ) {
+        return create_parameter( single_name, "", fn );
     }
     
-    /// \brief Add new command line parameter.
-	/// \param single_name Single name of parameter.
-	/// \param fn Pointer on function (with value).
-	/// \return reference on this parameter;
-	template< typename Arg >
-    cl_param& add_parameter( const std::string& single_name
-                        	 , void (*fn)( const Arg& ) ) {
-        detail::check_ptr( fn );
-        
-        check_uniq_names( single_name ); // Is it new name?
-        m_params.push_back( new cl_param( std::make_pair( single_name, "" )
-        								  , fn ) );
-        return m_params.back();
+	template< typename ArgType >
+    parameter& add_parameter( const std::string& single_name
+                              , void ( *fn )( const ArgType& ) ) {
+        return create_parameter( single_name, "", fn );
     }
     
-    /// \brief Add new command line parameter.
-    /// Used for POD-type argument (int, double, etc).
-	/// \param single_name Single name of parameter.
-	/// \param fn Pointer on function (with value).
-	/// \return reference on this parameter;
-	template< typename Arg >
-    cl_param& add_parameter( const std::string& single_name
-                        	 , void (*fn)( Arg ) ) {
-        detail::check_ptr( fn );
-        
-        check_uniq_names( single_name ); // Is it new name?
-        m_params.push_back( new cl_param( std::make_pair( single_name, "" )
-        								  , fn ) );
-        return m_params.back();
+	template< typename ArgType >
+    parameter& add_parameter( const std::string& single_name
+                              , void ( *fn )( ArgType ) ) {
+        return create_parameter( single_name, "", fn );
     }
     
-    /// \brief Add new command line parameter.
-	/// \param short_name Short name of parameter.
-	/// \param full_name Full name of parameter.
-	/// \param obj Pointer to object.
-	/// \param fn Pointer on object's function (without value).
-	/// \return reference on this parameter;
     template
-    	< 
-    		typename Object
-    		, typename Arg
-    	> 
-	cl_param& add_parameter( const std::string& short_name, 
-                        	 const std::string& full_name, 
-                        	 Object* 			obj,
-                        	 void (Object::*fn)() ) {
-        detail::check_ptr( obj, fn );
-        
-        if ( short_name == full_name ) {
-            std::string error = "Duplicate names of parameter: '"
-                                + short_name + "', '"
-                                + full_name + "'! Check your code.";
-            throw std::invalid_argument( error );
-        } else {}
-        
-        check_uniq_names( short_name, full_name ); // Is it new names?
-        m_params.push_back( new cl_param( std::make_pair( short_name, full_name )
-        								  , obj
-        								  , fn ) );
-        return m_params.back();
+    < 
+    	typename ObjectType
+    	, typename ArgType
+    > 
+	parameter& add_parameter( const std::string& short_name 
+                        	 , const std::string& full_name 
+                        	 , ObjectType* obj
+                        	 , void ( ObjectType::*fn )() ) {
+        return create_parameter( short_name, full_name, obj, fn );
     }
     
-    /// \brief Add new command line parameter.
-	/// \param short_name Short name of parameter.
-	/// \param full_name Full name of parameter.
-	/// \param obj Pointer to object.
-	/// \param fn Pointer on object's function (with value).
-	/// \return reference on this parameter;
     template
-    	< 
-    		typename Object
-    		, typename Arg
-    	> 
-	cl_param& add_parameter( const std::string& short_name, 
-                        	 const std::string& full_name, 
-                        	 Object* 			obj,
-                        	 void (Object::*fn)( const Arg& ) ) {  
-        detail::check_ptr( obj, fn );
-        
-        if ( short_name == full_name ) {
-            std::string error = "Duplicate names of parameter: '"
-                                + short_name + "', '"
-                                + full_name + "'! Check your code.";
-            throw std::invalid_argument( error );
-        } else {}
-        
-        check_uniq_names( short_name, full_name ); // Is it new names?
-        m_params.push_back( new cl_param( std::make_pair( short_name, full_name )
-        								  , obj
-        								  , fn ) );
-        return m_params.back();
+    < 
+    	typename ObjectType
+    	, typename ArgType
+    > 
+	parameter& add_parameter( const std::string& short_name 
+                        	 , const std::string& full_name 
+                        	 , ObjectType* obj
+                        	 , void ( ObjectType::*fn )() const ) {
+        return create_parameter( short_name, full_name, obj, fn );
+    }
+
+    template
+    < 
+    	typename ObjectType
+    	, typename ArgType
+    > 
+	parameter& add_parameter( const std::string& short_name 
+                        	 , const std::string& full_name 
+                        	 , ObjectType* obj
+                        	 , void ( ObjectType::*fn )( const ArgType& ) ) {
+        return create_parameter( short_name, full_name, obj, fn );
     }
      
-    /// \brief Add new command line parameter.
-    /// Used for POD-type argument (int, double, etc).
-	/// \param short_name Short name of parameter.
-	/// \param full_name Full name of parameter.
-	/// \param obj Pointer to object.
-	/// \param fn Pointer on object's function (with value).
-	/// \return reference on this parameter;
     template
-    	< 
-    		typename Object
-    		, typename Arg
-    	> 
-	cl_param& add_parameter( const std::string& short_name, 
-                        	 const std::string& full_name, 
-                        	 Object* 			obj,
-                        	 void (Object::*fn)( Arg ) ) {  
-        detail::check_ptr( obj, fn );
-        
-        if ( short_name == full_name ) {
-            std::string error = "Duplicate names of parameter: '"
-                                + short_name + "', '"
-                                + full_name + "'! Check your code.";
-            throw std::invalid_argument( error );
-        } else {}
-        
-        check_uniq_names( short_name, full_name ); // Is it new names?
-        m_params.push_back( new cl_param( std::make_pair( short_name, full_name )
-        								  , obj
-        								  , fn ) );
-        return m_params.back();
+    < 
+    	typename ObjectType
+    	, typename ArgType
+    > 
+	parameter& add_parameter( const std::string& short_name 
+                        	 , const std::string& full_name 
+                        	 , ObjectType* obj
+                        	 , void ( ObjectType::*fn )( const ArgType& ) const ) {
+        return create_parameter( short_name, full_name, obj, fn );
+    }
+
+    template
+    < 
+    	typename ObjectType
+    	, typename ArgType
+    > 
+	parameter& add_parameter( const std::string& short_name
+                        	 , const std::string& full_name
+                        	 , ObjectType* obj
+                        	 , void ( ObjectType::*fn )( ArgType ) ) {
+        return create_parameter( short_name, full_name, obj, fn );
+    }
+   
+    template
+    < 
+    	typename ObjectType
+    	, typename ArgType
+    > 
+	parameter& add_parameter( const std::string& short_name
+                        	 , const std::string& full_name
+                        	 , ObjectType* obj
+                        	 , void ( ObjectType::*fn )( ArgType ) const ) {
+        return create_parameter( short_name, full_name, obj, fn );
+    }
+
+    template< typename ObjectType >
+	parameter& add_parameter( const std::string& single_name
+                        	 , ObjectType* obj
+                        	 , void ( ObjectType::*fn )() ) {
+        return create_parameter( single_name, "", obj, fn );
     }
     
-    /// \brief Add new command line parameter.
-	/// \param single_name Single name of parameter.
-	/// \param obj Pointer to object.
-	/// \param fn Pointer on object's function (without value).
-	/// \return reference on this parameter;
-    template< typename Object > 
-	cl_param& add_parameter( const std::string& single_name,
-                        	 Object* 			obj,
-                        	 void (Object::*fn)() ) {  
-        detail::check_ptr( obj, fn );
-        
-        check_uniq_names( single_name ); // Is it new name?
-        m_params.push_back( new cl_param( std::make_pair( single_name, "" )
-        								  , obj
-        								  , fn ) );
-        return m_params.back();
+    template< typename ObjectType >
+	parameter& add_parameter( const std::string& single_name
+                        	 , ObjectType* obj
+                        	 , void ( ObjectType::*fn )() const ) {
+        return create_parameter( single_name, "", obj, fn );
+    }
+
+    template
+    < 
+    	typename ObjectType
+    	, typename ArgType
+    > 
+	parameter& add_parameter( const std::string& single_name
+                        	 , ObjectType* obj
+                        	 , void ( ObjectType::*fn )( const ArgType& ) ) {  
+        return create_parameter( single_name, "", obj, fn );
     }
     
-    /// \brief Add new command line parameter.
-	/// \param single_name Single name of parameter.
-	/// \param obj Pointer to object.
-	/// \param fn Pointer on object's function (with value).
-	/// \return reference on this parameter;
     template
-    	< 
-    		typename Object
-    		, typename Arg
-    	> 
-	cl_param& add_parameter( const std::string& single_name,
-                        	 Object* 			obj,
-                        	 void (Object::*fn)( const Arg& ) ) {  
-        detail::check_ptr( obj, fn );
-        
-        check_uniq_names( single_name ); // Is it new name?
-        m_params.push_back( new cl_param( std::make_pair( single_name, "" )
-        								  , obj
-        								  , fn ) );
-        return m_params.back();
+    < 
+    	typename ObjectType
+    	, typename ArgType
+    > 
+	parameter& add_parameter( const std::string& single_name
+                        	 , ObjectType* obj
+                        	 , void ( ObjectType::*fn )( const ArgType& ) const ) {  
+        return create_parameter( single_name, "", obj, fn );
     }
-    
-    /// \brief Add new command line parameter.
-    /// Used for POD-type argument (int, double, etc).
-	/// \param single_name Single name of parameter.
-	/// \param obj Pointer to object.
-	/// \param fn Pointer on object's function (with value).
-	/// \return reference on this parameter;
+
     template
-    	< 
-    		typename Object
-    		, typename Arg
-    	> 
-	cl_param& add_parameter( const std::string& single_name,
-                        	 Object* 			obj,
-                        	 void (Object::*fn)( Arg ) ) {  
-        detail::check_ptr( obj, fn );
-        
-        check_uniq_names( single_name ); // Is it new name?
-        m_params.push_back( new cl_param( std::make_pair( single_name, "" )
-        								  , obj
-        								  , fn ) );
-        return m_params.back();
+    < 
+    	typename ObjectType
+    	, typename ArgType
+    > 
+	parameter& add_parameter( const std::string& single_name
+                        	 , ObjectType* obj
+                        	 , void ( ObjectType::*fn )( ArgType ) ) {  
+        return create_parameter( single_name, "", obj, fn );
     }
-public:
- 	/// \brief Set another value separator, instead default '='.
- 	/// \param sep Separator.
- 	/// \throw std::invalid_argument If separator is space symbol.
-    void set_value_separator( char sep ) {
-    	if ( ' ' == sep ) { 
-    		throw std::invalid_argument( "Space symbol cannot be value separator!" );
-    	} else {}
-        m_value_separator = sep;
+
+    template
+    < 
+    	typename ObjectType
+    	, typename ArgType
+    > 
+	parameter& add_parameter( const std::string& single_name
+                        	 , ObjectType* obj
+                        	 , void ( ObjectType::*fn )( ArgType ) const ) {  
+        return create_parameter( single_name, "", obj, fn );
     }
 private:
-    /// \brief Check unnamed parameters.
-    /// If some fact parameter inputed without name - check
-    /// parameter with _this_ order number.
-    /// \param fact_params Container of inputed parameters.
-    void check_unnamed_params( detail::str_storage& fact_params ) {
-        for ( size_t i = 0; i < fact_params.size(); ++i ) {
-            std::string& fact_param = fact_params[i];
-            // Is this unnamed parameter?
-            if ( !boost::contains( fact_param, m_value_separator ) ) {
-                // Probably unnamed parameter.
-                // Is some unnamed parameters sets?
-                BOOST_FOREACH ( const cl_param& param, m_params ) {
-                    if ( (i + 1) == param.order_number ) {
-                        // Find.
-                        fact_param = param.name.first + m_value_separator + fact_param;
-                    } else {}
-                }
-            } else {}
+    parameters registered_parameters;
+private:
+    template< typename PtrToFun >
+    parameter& create_parameter( const std::string&  short_name
+                                , const std::string& full_name
+                                , const PtrToFun&    ptr_to_fun ) { 
+        check_null_ptr( ptr_to_fun, short_name );
+        check_names_validity( short_name, full_name );
+
+        registered_parameters += parameter( short_name, full_name, ptr_to_fun );
+        return registered_parameters.back();
+    }
+
+    template
+    < 
+        typename PtrToObj
+        , typename PtrToObjFun
+    >
+    parameter& create_parameter( const std::string&  short_name
+                                , const std::string& full_name
+                                , const PtrToObj&    ptr_to_obj
+                                , const PtrToObjFun& ptr_to_fun ) {
+        check_null_ptr( ptr_to_obj, short_name );
+        check_null_ptr( ptr_to_fun, short_name );
+        check_names_validity( short_name, full_name );
+        
+        registered_parameters += parameter( short_name, full_name, ptr_to_obj, ptr_to_fun );
+        return registered_parameters.back();
+    }
+private:
+    template< typename Ptr >
+    void check_null_ptr( const Ptr& ptr, const std::string& parameter_name ) const {
+        if ( 0 == ptr ) {
+            const std::string what_happened =
+                "Zero pointer (function/object/method) detected for parameter '" + parameter_name + "'!";
+            throw std::invalid_argument( what_happened );
+        } else {}
+    }
+
+    void check_names_validity( const std::string& short_name, const std::string& full_name ) const {
+        check_spaces_existence_in( short_name );
+        check_spaces_existence_in( full_name );
+        check_equality_of( short_name, full_name );
+        check_uniqueness_of( short_name );
+        check_uniqueness_of( full_name );
+    }
+
+    void check_spaces_existence_in( const std::string& name ) const {
+        if ( boost::contains( name, " " ) ) {
+            const std::string what_happened = 
+                    "Invalid parameter's name '" + name + "', it shouldn't contains space(s)!";
+            throw std::runtime_error( what_happened );
+        } else {}
+    }
+
+    void check_equality_of( const std::string& short_name, const std::string& full_name ) const {
+	    if ( short_name == full_name ) {
+            const std::string what_happened = "Equal names of parameter: '"
+                                              + short_name + "', '" + full_name + "'!";
+            throw std::invalid_argument( what_happened );
+        } else {}
+    }
+    
+    void check_uniqueness_of( const std::string& name ) const {
+        parameter_const_it it = std::find( registered_parameters.begin()
+                                           , registered_parameters.end()
+                                           , name );
+        if ( registered_parameters.end() != it ) {
+            const std::string what_happened = "Parameter with name '" + name + "' already exists!";
+            throw std::invalid_argument( what_happened );
+        } else {}
+    } 
+private:
+    std::string name_value_separator;
+    common_checkers checkers;
+    detail::parameter_parts_extractor_p extractor;
+public:
+    void set_value_separator( char separator ) {
+        check_printable_of( separator );
+        name_value_separator = separator;
+    }
+private:
+    void check_printable_of( char separator ) const {
+        const int ascii_code = separator;
+        if ( ascii_code <= 0x20 ) {
+            const std::string what_happened = "Symbol (ASCII-code is "
+                                              + detail::to_str( separator )
+                                              + ") is not suitable for name-value separator!";
+            throw std::invalid_argument( what_happened );
+        } else {}
+    }
+public:
+    void parse( int argc, char** argv ) {
+        detail::str_storage inputed_parameters = obtain_parameters_from( argc, argv );
+        if ( there_is_nothing_to_parse( inputed_parameters ) ) {
+            return;
+        } else {}
+        
+        create_parameter_parts_extractor();
+        create_parameters_checkers();
+        base_checks( inputed_parameters );
+        handle_unnamed_parameters( inputed_parameters );
+        remaining_checks( inputed_parameters );
+        call_corresponding_user_functions( inputed_parameters );
+    }
+private:
+    detail::str_storage obtain_parameters_from( int argc, char** argv ) const {
+        detail::str_storage inputed_parameters;
+        for ( int i = 1; i < argc; ++i ) {
+            inputed_parameters += argv[i];
+        }
+        return inputed_parameters;
+    }
+    
+    bool there_is_nothing_to_parse( const detail::str_storage& inputed_parameters ) const {
+        return inputed_parameters.empty() 
+               && no_parameters_with_default_value()
+               && no_necessary_parameters();
+    }
+
+    bool no_parameters_with_default_value() const {
+        parameter_const_it it = std::find_if( registered_parameters.begin()
+                                              , registered_parameters.end()
+                                              , boost::mem_fn( &parameter::has_default_value ) );
+        return registered_parameters.end() == it;
+    }
+
+    bool no_necessary_parameters() const {
+        parameter_const_it it = std::find_if( registered_parameters.begin()
+                                              , registered_parameters.end()
+                                              , boost::mem_fn( &parameter::it_is_necessary ) );
+        return registered_parameters.end() == it;
+    }
+    
+    void handle_unnamed_parameters( detail::str_storage& inputed_parameters ) {
+        detail::unnamed_parameters_handler handle( registered_parameters
+                                                   , *extractor
+                                                   , name_value_separator );
+        handle( inputed_parameters );
+    }
+
+    void create_parameter_parts_extractor() {
+        extractor.reset( new detail::parameter_parts_extractor( name_value_separator ) );
+    } 
+
+    void create_parameters_checkers() {
+        using namespace detail;
+
+        checkers.push_back( 
+                new parameters_existence_checker( registered_parameters, *extractor, name_value_separator ) );
+        checkers.push_back( 
+                new parameters_redundancy_checker( registered_parameters, *extractor, name_value_separator ) ); 
+        checkers.push_back( 
+                new parameters_repetition_checker( registered_parameters, *extractor, name_value_separator ) );
+        checkers.push_back( 
+                new incorrect_parameters_checker( registered_parameters, *extractor, name_value_separator ) ); 
+        checkers.push_back( 
+                new necessary_parameters_checker( registered_parameters, *extractor, name_value_separator ) );
+        checkers.push_back( 
+                new parameters_values_checker( registered_parameters, *extractor, name_value_separator ) );
+        checkers.push_back( 
+                new values_semantic_checker( registered_parameters, *extractor, name_value_separator ) );
+    }
+    
+    void base_checks( const detail::str_storage& inputed_parameters ) {
+        const size_t base_checkers_quantity = 3;
+        for ( checker_const_it it = checkers.begin();
+              checkers.begin() + base_checkers_quantity != it;
+              ++it ) {
+            it->check( inputed_parameters );
+        }
+        checkers.erase( checkers.begin(), checkers.begin() + base_checkers_quantity );
+    }
+    
+    void remaining_checks( const detail::str_storage& inputed_parameters ) {
+        for ( checker_const_it it = checkers.begin(); checkers.end() != it; ++it ) {
+            it->check( inputed_parameters );
         }
     }
 
-	/// \brief Check uniq names.
-	/// \param short_name Short name of parameter.
-	/// \param full_name Full name of parameter.
-	/// \throw std::invalid_argument If short or full name already used.
-    void check_uniq_names( const std::string& short_name, const std::string& full_name = "" ) {
-        BOOST_FOREACH ( const cl_param& param, m_params ) {
-            if ( !full_name.empty() ) {
-                if ( corresponds( param, short_name )
-                     || corresponds( param, full_name ) ) {
-                    std::string error = "Parameter's names '"
-                                        + short_name 
-                                        + "' and/or '"
-                                        + full_name + "' not uniq! Check your code.";
-                    throw std::invalid_argument( error );
-                } else {}
-            } else {
-                if ( corresponds( param, short_name ) ) {
-                    std::string error = "Parameter's name '"
-                                        + short_name + "' not uniq! Check your code.";
-                    throw std::invalid_argument( error );
-                } else {}
-            }
-        }
-    }
-    
-    /// \brief Check redundancy of parameters.
-    /// \param fact_params_quantity Quantity of inputed parameters.
-    /// \throw std::runtime_error If quantity of inputed parameters more than defined.
-    void check_params_redundancy( size_t fact_params_quantity ) {
-        if ( fact_params_quantity > m_params.size() ) {
-            std::string error = "Too much parameters, defined only " 
-                                + boost::lexical_cast< std::string >( m_params.size() )
-                                + ".";
-            throw std::runtime_error( error );
-        } else {}
-    }
-    
-    /// \brief Check incorrect parameters.
-    /// Incorrect parameters not allowed.
-    /// \param fact_params Container of inputed parameters.
-    /// \throw std::runtime_error If incorrect parameter(s) exists.
-    void check_incorrect_params( const detail::str_storage& fact_params ) {
-        BOOST_FOREACH ( const std::string& fact_param, fact_params ) {
-            std::string check_fact_param = retrieve( name, fact_param );
-            
-            BOOST_FOREACH ( const cl_param& param, m_params ) {
-                if ( corresponds( param, check_fact_param ) ) {
-                    check_fact_param.clear();
-                    break;
-                } else {}
-            }
-            
-            if ( !check_fact_param.empty() ) {
-                std::string error = "Incorrect parameter '" + check_fact_param + "'!";
-                std::string maybe = " Check defined parameter(s) or correction of value separator.";
-                throw std::runtime_error( error + maybe );
-            } else {}
-        }
-    }
-    
-    /// \brief Check existence of all parameters which defined as necessary.
-    /// \param fact_params Container of inputed parameters.
-    /// \throw std::runtime_error If some necessary parameter(s) missing.
-    void check_necessary_params( const detail::str_storage& fact_params ) {
-    	detail::str_storage names;
-    	
-    	BOOST_FOREACH ( const cl_param& param, m_params ) {
-            if ( param.is_necessary ) {
-            	names.push_back( param.name.first );
-            } else {}
-        }
-        
-        BOOST_FOREACH ( const std::string& fact_param, fact_params ) {
-        	std::string check_fact_param = retrieve( name, fact_param );
-            names.erase( std::remove( names.begin() 
-            						  , names.end()
-            						  , check_fact_param ) 
-            			 , names.end() );
-        }
-        
-        if ( !names.empty() ) {
-        	std::string error = "Parameter(s): ";
-        	BOOST_FOREACH ( const std::string& name, names ) {
-        		error += "'" + name + "', ";
-        	}
-        	boost::erase_last( error, ", " );
-        	error += " are defined as necessary, but it missing!";
-        	throw std::runtime_error( error );
-        } else {}
-    }
-    
-    /// \brief Check repetition of parameter(s).
-    /// \param fact_params Container of inputed parameters.
-    /// \throw std::runtime_error If some parameter(s) repeating.
-    void check_params_repetition( const detail::str_storage& fact_params ) {
-        std::set< std::string > uniq_check;
-        BOOST_FOREACH ( const std::string& fact_param, fact_params ) {
-            std::string check_fact_param = retrieve( name, fact_param );
-            BOOST_FOREACH ( const cl_param& param, m_params ) {
-                if ( corresponds( param, check_fact_param ) ) {
-                    uniq_check.insert( param.name.first );
-                    break;
-                } else {}
-            }
-        }
-        
-        if ( uniq_check.size() != fact_params.size() ) {
-            throw std::runtime_error( "Parameter(s) repetition!" );
-        } else {}
-    }
-    
-    /// \brief Check correction of parameter's values. 
-    /// If parameter defined with value - it value _must_ exists.
-    /// If parameter defined without value - no value.
-    /// \param fact_params Container of inputed parameters.
-    /// \throw std::runtime_error If some parameter(s) incorrect.
-    void check_values_correction( const detail::str_storage& fact_params ) {
-    	BOOST_FOREACH ( const std::string& fact_param, fact_params ) {
-    		std::string param_name = retrieve( name, fact_param );
-    		if ( boost::contains( fact_param, m_value_separator ) ) {
-    			// Maybe, parameter with value...
-    			BOOST_FOREACH ( const cl_param& param, m_params ) {
-    				if ( corresponds( param, param_name ) ) {
-						// Find!
-					    if ( !param.sig.empty() ) {
-					    	// Parameter without value, incorrect!
-					    	std::string error = "Parameter '" 
-					    	                    + param_name 
-					    	                    + "' defined without value!";
-					    	throw std::runtime_error( error );
-					    } else {
-					    	// Check factual value existence.
-					    	std::string param_value = retrieve( value, fact_param );
-					    	if ( param_value.empty() ) {
-					    		std::string error = "Parameter '" 
-					    		                    + param_name 
-					    		                    + "' defined with value, but it missing!";
-					    		throw std::runtime_error( error );
-					    	} else {}
-					    }
-					} else {}
-    			}
-    		} else {
-    			// Maybe, parameter without value...
-    			BOOST_FOREACH ( const cl_param& param, m_params ) {
-    				if ( corresponds( param, param_name ) ) {
-						// Find!
-					    if ( param.sig.empty() ) {
-					    	// Parameter with value, incorrect!
-					    	std::string error = "Parameter '" + param_name + "' defined with value!";
-					    	throw std::runtime_error( error );
-					    } else {}
-					} else {}
-    			}
-    		}
-    	}
-    }
-    
-    /// \brief Check parameter's value semantic.
-    /// \param fact_params Container of inputed parameters.
-    /// \throw std::exception If semantic incorrect.
-    void check_values_semantic( const detail::str_storage& fact_params ) {
-    	// For parameter's _default_ value semantic checking.
-    	detail::str_storage names;
-    	
-    	BOOST_FOREACH ( const cl_param& param, m_params ) {
-    		names.push_back( param.name.first );
-    	}
-    	
-    	BOOST_FOREACH ( const std::string& fact_param, fact_params ) {
-    		if ( boost::contains( fact_param, m_value_separator ) ) {
-    			std::string param_name = retrieve( name, fact_param );
-    			BOOST_FOREACH ( const cl_param& param, m_params ) {
-					if ( corresponds( param, param_name )
-					     && no_semantic != param.value_s ) {
-                        (*m_vs_checker.at( param.value_s ))( retrieve( value, fact_param ) );
-                        // Not need anymore...
-					    names.erase( std::remove( names.begin()
-					    						  , names.end()
-					    						  , param.name.first )
-					                 , names.end() );
-						break; 
-					} else {}
-				}
-    		} else {}
-    	}
-    	
-    	// Check parameter's _default_ value semantic.
-    	BOOST_FOREACH ( const cl_param& param, m_params ) {
-    		detail::str_storage::iterator it = std::find( names.begin(), 
-    		                                              names.end(), 
-    		                                              param.name.first );
-    		if ( names.end() != it 
-    			 && param.has_def_value
-    			 && no_semantic != param.value_s ) {
-				// Value's semantic checks only for <std::string> values,
-				// because numeric values - is just numbers. :-)
-				if ( typeid( detail::s_arg_holder_p ) == param.for_arg.type() ) {
-					detail::s_arg_holder_p p = boost::any_cast< detail::s_arg_holder_p >( param.for_arg );
-					(*m_vs_checker.at( param.value_s ))( p->def_value );
-				}
-    		} else {}
-    	}
-    }
-    
-    /// \brief Retrieve part from parameter.
-    /// It can be parameter's name or parameter's value.
-    /// \param part_type Part's type.
-    /// \param fact_param Parameter.
-    /// \return Part.
-    std::string retrieve( const parameter_part& part_type
-    					  , const std::string& 	fact_param ) const {
-    	std::string part( fact_param );
-    	if ( boost::contains( part, m_value_separator ) ) { 
-            detail::str_storage param_parts;
-		    boost::split( param_parts, fact_param, boost::is_any_of( m_value_separator ) );
-		    if ( param_parts.size() > 2 ) {
-		        std::string error = "Separator repetition in param '" + fact_param + "'!";
-		        throw std::runtime_error( error );
-		    } else {}
-		    if 	    ( part_type == name  ) { part = param_parts.front(); }
-		    else if ( part_type == value ) { part = param_parts.back(); }
-        } else {}
-        return part;
-    }
-    
-    /// \brief Check correspondence of parameter's name and fact name.
-    /// \param parameter Parameter.
-    /// \param fact_param_name Factual name.
-    /// \return true If corresponds.
-    bool corresponds( const cl_param& 	 	parameter
-    				  , const std::string& 	fact_param_name ) const {
-    	return fact_param_name == parameter.name.first
-    	       || fact_param_name == parameter.name.second;
-    }
-public:
-	/// \brief Parsing of inputed parameters.
-	/// \param argc standard main() arg quantity.
-	/// \param argv standard main() arg array.
-	/// \throw std::exception If any problems occures.
-    void parse( int argc, char** argv ) {
-        detail::str_storage fact_params;
-        // Begin on 1 element, because 0 is program's name.
-        for ( int i = 1; i < argc; ++i ) {
-            fact_params.push_back( std::string( argv[i] ) );
-        }
-        
-        // Is any parameters are defined?
-        if ( m_params.empty() && !fact_params.empty() ) {
-            throw std::runtime_error( "You input some parameters, but no one defined!" );
-        } else {}
-        
-        // Checks.
-        check_params_redundancy( fact_params.size() );
-        check_unnamed_params( fact_params );
-        check_incorrect_params( fact_params );
-        check_params_repetition( fact_params );
-        check_necessary_params( fact_params );
-        check_values_correction( fact_params );
-        check_values_semantic( fact_params );
-        
-        // For callbacks for parameters with _default_ values.
-    	detail::str_storage names;
-    	BOOST_FOREACH ( const cl_param& param, m_params ) {
-    		names.push_back( param.name.first );
-    	}
-        
-        // Callbacks.
-        BOOST_FOREACH ( const std::string& fact_param, fact_params ) {
-            std::string fact_param_name( fact_param );
-            std::string fact_param_value;
-            if ( boost::contains( fact_param_name, m_value_separator ) ) {
-                fact_param_name  = retrieve( name, fact_param );
-                fact_param_value = retrieve( value, fact_param );
-            } else {}
-            BOOST_FOREACH ( cl_param& param, m_params ) {
-                if ( corresponds( param, fact_param_name ) ) {
-                    if ( !param.sig.empty() ) {
-                    	// Parameter without value.
-                        param.sig();
-                        names.erase( std::remove( names.begin()
-                        						  , names.end()
-                        						  , param.name.first )
-					                 , names.end() );
-                        break;
-                    } else {
-                    	// Parameter with value.
-                        std::string error = "Value of parameter '" + fact_param_name + "' must be ";
-                    	if 		  ( typeid( detail::i_arg_holder_p ) == param.for_arg.type() ) {
-							detail::i_arg_holder_p p = boost::any_cast< detail::i_arg_holder_p >( param.for_arg );
-							try {
-                                p->sig_with_value( boost::lexical_cast< int >( fact_param_value ) );
-                            } catch ( const std::exception& /* exc */ ) {
-                                throw std::invalid_argument( error + "<int>!" );
-                            }
-						} else if ( typeid( detail::ui_arg_holder_p ) == param.for_arg.type() ) {
-							detail::ui_arg_holder_p p = boost::any_cast< detail::ui_arg_holder_p >( param.for_arg );
-							try {
-                                p->sig_with_value( boost::lexical_cast< unsigned int >( fact_param_value ) );
-						    } catch ( const std::exception& /* exc */ ) {
-                                throw std::invalid_argument( error + "<unsigned int>!" );
-                            }
-                        } else if ( typeid( detail::d_arg_holder_p ) == param.for_arg.type() ) {
-							detail::d_arg_holder_p p = boost::any_cast< detail::d_arg_holder_p >( param.for_arg );
-							try {
-                                p->sig_with_value( boost::lexical_cast< double >( fact_param_value ) );
-						    } catch ( const std::exception& /* exc */ ) {
-                                throw std::invalid_argument( error + "<double>!" );
-                            }
-                        } else if ( typeid( detail::s_arg_holder_p ) == param.for_arg.type() ) {
-							detail::s_arg_holder_p p = boost::any_cast< detail::s_arg_holder_p >( param.for_arg );
-							// Already std::string argument, no need lexical_cast.
-							p->sig_with_value( fact_param_value );
-						}
-                        
-                        names.erase( std::remove( names.begin()
-                        						  , names.end()
-                        						  , param.name.first )
-					                 , names.end() );
-                        break;
-                    }
-                } else {}
-            }
-        }
-        
-        // Callbacks for parameters with _default_ value.
-        BOOST_FOREACH ( cl_param& param, m_params ) {
-    		detail::str_storage::iterator it = std::find( names.begin() 
-    		                                              , names.end() 
-    		                                              , param.name.first );
-    		if ( names.end() != it 
-    		     && param.sig.empty()
-    		     && param.has_def_value ) {
-    		    if 		  ( typeid( detail::i_arg_holder_p ) == param.for_arg.type() ) {
-					detail::i_arg_holder_p p = boost::any_cast< detail::i_arg_holder_p >( param.for_arg );
-					p->sig_with_value( p->def_value );
-				} else if ( typeid( detail::ui_arg_holder_p ) == param.for_arg.type() ) {
-					detail::ui_arg_holder_p p = boost::any_cast< detail::ui_arg_holder_p >( param.for_arg );
-					p->sig_with_value( p->def_value );
-				} else if ( typeid( detail::d_arg_holder_p ) == param.for_arg.type() ) {
-					detail::d_arg_holder_p p = boost::any_cast< detail::d_arg_holder_p >( param.for_arg );
-					p->sig_with_value( p->def_value );
-				} else if ( typeid( detail::s_arg_holder_p ) == param.for_arg.type() ) {
-					detail::s_arg_holder_p p = boost::any_cast< detail::s_arg_holder_p >( param.for_arg );
-					p->sig_with_value( p->def_value );
-				}
-    		} else {}
-    	}
+    void call_corresponding_user_functions( const detail::str_storage& inputed_parameters ) {
+        detail::user_functions_caller caller( registered_parameters, *extractor, name_value_separator );
+        caller.call( inputed_parameters );
     }
 };
 
-} // namespace clp_parser
- 
-#endif // COMMAND_LINE_PARAMETERS_PARSER_HPP
+/// For backward compatibility with old versions.
+typedef command_line_parameters_parser command_line_parameter_parser;
+
+} // namespace clpp
+
+/// For backward compatibility with old versions.
+namespace clp_parser = clpp;
+
+#endif // CLPP_PARSER_HPP
