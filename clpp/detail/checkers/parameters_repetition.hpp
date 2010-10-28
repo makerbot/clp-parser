@@ -1,4 +1,5 @@
 // C++ Command line parameters parser.
+// http://clp-parser.sourceforge.net/
 //
 // Copyright (C) Denis Shevchenko, 2010.
 // shev.denis @ gmail.com
@@ -14,8 +15,6 @@
 // all copies or substantial portions of the Software.
 //
 // See http://www.opensource.org/licenses/mit-license.php
-//
-// http://clp-parser.sourceforge.net/
 
 #ifndef CLPP_DETAIL_PARAMETERS_REPETITION_HPP
 #define CLPP_DETAIL_PARAMETERS_REPETITION_HPP
