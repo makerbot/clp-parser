@@ -1,8 +1,19 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This is CHANGELOG file for 'Command line parameters parser (CLPP)' library.
 
-Last update: October 27, 2010
+Last update: October 28, 2010
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+2.0.1 --> 2.0.2
+
+- Change license from LGPL to MIT.
+
+
+2.0 --> 2.0.1
+
+- Fix bug with member-function without argument.
+- Add experimental support of 'e-mail' semantic.
+
 
 1.0 --> 2.0
 

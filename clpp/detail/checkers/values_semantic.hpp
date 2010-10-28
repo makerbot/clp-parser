@@ -1,20 +1,19 @@
-// Command line parameters parser.
+// C++ Command line parameters parser.
 //
 // Copyright (C) Denis Shevchenko, 2010.
 // shev.denis @ gmail.com
 //
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, see http://www.gnu.org/licenses/lgpl.html
+// See http://www.opensource.org/licenses/mit-license.php
 //
 // http://clp-parser.sourceforge.net/
 
@@ -87,6 +86,30 @@ void check_path_existence( const std::string& path, const std::string& parameter
     } else {}
 }
 
+void check_email_validity( const std::string& email, const std::string& parameter_name ) {
+    const std::string what_happened = lib_prefix() 
+                                      + "Semantic error: parameter '" + parameter_name + "'"
+                                      + " has invalid e-mail value '" + email + "'!";
+    if ( !boost::contains( email, "@" ) || !boost::contains( email, "." ) ) {
+        throw std::invalid_argument( what_happened );
+    } else {}
+    
+    const size_t at_quantity = size_t( std::count( email.begin(), email.end(), '@' ) );
+    if ( at_quantity > 1 ) {
+        throw std::invalid_argument( what_happened );
+    } else {}
+
+    const size_t at_position        = email.find_first_of( '@' );
+    const size_t last_dot_position  = email.find_last_of( '.' );
+    const size_t last_char_position = email.size() - 1;
+    if ( 0 == at_position 
+         || last_char_position == last_dot_position 
+         || ( last_dot_position - at_position ) == 1
+         || at_position > last_dot_position ) {
+        throw std::invalid_argument( what_happened ); 
+    } else {}
+}
+
 typedef common_checker< parameters, parameter_parts_extractor, std::string > checker;
 
 /// \class values_semantic_checker
@@ -109,10 +132,11 @@ public:
                              , const parameter_parts_extractor& extractor
                              , const std::string&               name_value_separator ) :
             checker( registered_parameters, extractor, name_value_separator ) {
-        insert( semantic_checkers )( path, check_path_existence )
-                                   ( ipv4, check_ipv4_validity )
-                                   ( ipv6, check_ipv6_validity )
-                                   ( ip,   check_ip_validity )
+        insert( semantic_checkers )( path,  check_path_existence )
+                                   ( ipv4,  check_ipv4_validity )
+                                   ( ipv6,  check_ipv6_validity )
+                                   ( ip,    check_ip_validity )
+                                   ( email, check_email_validity )
                                    ;
     }
 private:
