@@ -23,11 +23,9 @@
 #include "../parameter.hpp"
 #include "../parameter_parts_extractor.hpp"
 #include "../argument_caster.hpp"
+#include "validators.hpp"
 
 #include <boost/assign.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/asio/ip/address_v4.hpp>
-#include <boost/asio/ip/address_v6.hpp>
 
 /// \namespace clpp
 /// \brief Main namespace of library.
@@ -38,76 +36,6 @@ namespace clpp {
 namespace detail {
 
 using namespace boost::assign;
-
-void check_ipv4_validity( const std::string& address, const std::string& parameter_name ) {
-    try {
-        boost::asio::ip::address_v4 a( boost::asio::ip::address_v4::from_string( address ) );
-    } catch ( const std::exception& /* exc */ ) {
-        const std::string what_happened = lib_prefix() 
-                                          + "Semantic error: parameter '" + parameter_name + "'" 
-                                          + " has invalid IPv4 value '" + address + "'!";
-        throw std::invalid_argument( what_happened );
-    }
-}
-
-void check_ipv6_validity( const std::string& address, const std::string& parameter_name ) {
-    try {
-        boost::asio::ip::address_v6 a( boost::asio::ip::address_v6::from_string( address ) );
-    } catch ( const std::exception& /* exc */ ) {
-        const std::string what_happened = lib_prefix() 
-                                          + "Semantic error: parameter '" + parameter_name + "'" 
-                                          + " has invalid IPv6 value '" + address + "'!";
-        throw std::invalid_argument( what_happened );
-    }
-}
-
-void check_ip_validity( const std::string& address, const std::string& parameter_name ) {
-    try {
-        check_ipv4_validity( address, parameter_name );
-    } catch ( const std::exception& /* exc */ ) {
-        try {
-            check_ipv6_validity( address, parameter_name );
-        } catch ( const std::exception& /* exc */ ) {
-            const std::string what_happened = lib_prefix() 
-                                              + "Semantic error: parameter '" + parameter_name + "'" 
-                                              + " has invalid value '" + address + "' (not IPv4, not IPv6)!";
-            throw std::invalid_argument( what_happened );
-        }
-    }
-}
-
-void check_path_existence( const std::string& path, const std::string& parameter_name ) {
-	if ( !boost::filesystem::exists( path ) ) {
-        const std::string what_happened = lib_prefix() 
-                                          + "Semantic error: parameter '" + parameter_name + "'" 
-                                          + " has invalid path value '" + path + "' (no such path)!";
-        throw std::invalid_argument( what_happened );
-    } else {}
-}
-
-void check_email_validity( const std::string& email, const std::string& parameter_name ) {
-    const std::string what_happened = lib_prefix() 
-                                      + "Semantic error: parameter '" + parameter_name + "'"
-                                      + " has invalid e-mail value '" + email + "'!";
-    if ( !boost::contains( email, "@" ) || !boost::contains( email, "." ) ) {
-        throw std::invalid_argument( what_happened );
-    } else {}
-    
-    const size_t at_quantity = size_t( std::count( email.begin(), email.end(), '@' ) );
-    if ( at_quantity > 1 ) {
-        throw std::invalid_argument( what_happened );
-    } else {}
-
-    const size_t at_position        = email.find_first_of( '@' );
-    const size_t last_dot_position  = email.find_last_of( '.' );
-    const size_t last_char_position = email.size() - 1;
-    if ( 0 == at_position 
-         || last_char_position == last_dot_position 
-         || ( last_dot_position - at_position ) == 1
-         || at_position > last_dot_position ) {
-        throw std::invalid_argument( what_happened ); 
-    } else {}
-}
 
 typedef common_checker< parameters, parameter_parts_extractor, std::string > checker;
 
